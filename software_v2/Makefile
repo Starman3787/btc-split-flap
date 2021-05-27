@@ -50,6 +50,7 @@ C_SRC += ./drivers/motor/motor.c
 C_SRC += ./timers/systick/systick.c
 C_SRC += ./timers/systick/systick_interrupt_handler.c
 C_SRC += ./delay.c
+C_SRC += ./drivers/wifi/wifi.c
 
 INCLUDE = -I./
 INCLUDE += -I./headers
