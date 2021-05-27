@@ -39,6 +39,13 @@ void init_motor(void)
 {
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOFEN;
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIODEN;
+    
+    GPIOD->MODER |= (0b01 << (motor_enable_pins[0] * 2));
+    GPIOD->MODER |= (0b01 << (motor_enable_pins[1] * 2));
+    GPIOD->MODER |= (0b01 << (motor_enable_pins[2] * 2));
+    GPIOD->MODER |= (0b01 << (motor_enable_pins[3] * 2));
+    GPIOD->MODER |= (0b01 << (motor_enable_pins[4] * 2));
+
     GPIOF->MODER |= (0b01 << (motor_pins[0] * 2));
     GPIOF->MODER |= (0b01 << (motor_pins[1] * 2));
     GPIOF->MODER |= (0b01 << (motor_pins[2] * 2));
