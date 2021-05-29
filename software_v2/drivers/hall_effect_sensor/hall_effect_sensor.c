@@ -1,25 +1,17 @@
 /**
  * @file hall_effect_sensor.c
  * @author Starman
- * @brief Standard functions for interracting with a hall effect sensor
- * @version 0.1
- * @date 2021-05-27
+ * @brief Standard functions for interacting with a hall effect sensor
+ * @version 0.2
+ * @date 2021-05-29
  * 
  * @copyright Copyright (c) 2021
  * 
  */
-#include "../../headers/stm32f767xx.h"
 #include <stdbool.h>
 #include <stdint.h>
-
-/**
- * Pin  - Sensor
- * 
- * PE2  - 0
- *
- */
-uint8_t hall_effect_sensor_pins[] = {
-    2};
+#include "../../headers/stm32f767xx.h"
+#include "./hall_effect_sensor.h"
 
 /**
  * @brief Initialises the hall effect sensor by setting the mode

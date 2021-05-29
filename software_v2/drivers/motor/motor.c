@@ -1,49 +1,16 @@
 /**
  * @file motor.c
  * @author Starman
- * @brief Standard motor functions for interracting with stepper motors in combination with an A4988 driver
- * @version 0.1
- * @date 2021-05-27
+ * @brief Standard motor functions for interacting with stepper motors in combination with an A4988 driver
+ * @version 0.2
+ * @date 2021-05-29
  * 
  * @copyright Copyright (c) 2021
  * 
  */
-#include "../../headers/stm32f767xx.h"
 #include <stdint.h>
-
-/**
- * Pin  - Motor
- * 
- * PF7  - 0
- * PF8  - 1
- * PF9  - 2
- * PF10 - 3
- * PF15 - 4
- *
- */
-uint8_t motor_pins[] = {
-    7,
-    8,
-    9,
-    10,
-    15};
-
-/**
- * Pin  - Motor
- * 
- * PD0  - 0
- * PD1  - 1
- * PD2  - 2
- * PD3  - 3
- * PD4  - 4
- * 
- */
-uint8_t motor_enable_pins[] = {
-    0,
-    1,
-    2,
-    3,
-    4};
+#include "../../headers/stm32f767xx.h"
+#include "./motor.h"
 
 /**
  * @brief Initialises the motor by setting the mode for both the enable and step pins
