@@ -22,8 +22,12 @@ void init_hall_effect_sensor(void)
     // enable the GPIO clock
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOEEN;
 
-    // set the mode for the digital input pin
+    // set the mode for the digital input pins
     GPIOE->MODER &= ~(0b11 << (hall_effect_sensor_pins[0] * 2));
+    GPIOE->MODER &= ~(0b11 << (hall_effect_sensor_pins[1] * 2));
+    GPIOE->MODER &= ~(0b11 << (hall_effect_sensor_pins[2] * 2));
+    GPIOE->MODER &= ~(0b11 << (hall_effect_sensor_pins[3] * 2));
+    GPIOE->MODER &= ~(0b11 << (hall_effect_sensor_pins[4] * 2));
 }
 
 /**
