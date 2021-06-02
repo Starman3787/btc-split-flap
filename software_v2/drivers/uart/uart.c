@@ -40,3 +40,34 @@ void init_uart(void)
     UART4->CR1 |= USART_CR1_TE;
     UART4->CR1 |= USART_CR1_UE;
 }
+
+void write_uart(char *byte)
+{
+    // interrupt and status register
+    uint16_t isr;
+    do
+    {
+        // set current value
+        // to prevent compiler from optimising this bit out
+        isr = !(UART4->ISR & USART_ISR_TXE);
+    }
+    while (isr);
+
+    // transmite the byte
+    UART4->TDR = *byte;
+}
+
+char read_uart(void)
+{
+    // interrupt and status register
+    uint16_t isr;
+    do
+    {
+        // set current value
+        // prevents compiler from optimising this loop out
+        isr = (!UART4->ISR & USART_ISR_RXNE);
+    } while (isr);
+    
+    // return the register value
+    return UART4->RDR;
+}
