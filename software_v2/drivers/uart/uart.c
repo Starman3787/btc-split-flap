@@ -23,17 +23,17 @@ void init_uart(void)
     RCC->APB1ENR |= RCC_APB1ENR_UART4EN;
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
 
+    // set the alternate function
+    GPIOC->AFR[1] |= (0b1000 << ((uart_pins[0] - 8) * 4));
+    GPIOC->AFR[1] |= (0b1000 << ((uart_pins[1] - 8) * 4));
+
     // set the mode to alternate function
     GPIOC->MODER |= (0b10 << (uart_pins[0] * 2));
     GPIOC->MODER |= (0b10 << (uart_pins[1] * 2));
 
-    // set the alternate function
-    GPIOC->AFR[1] |= (0b0001 << ((uart_pins[0] - 8) * 4));
-    GPIOC->AFR[1] |= (0b0001 << ((uart_pins[1] - 8) * 4));
-
     // calculate and set the baud rate
     uint16_t uartdiv = CORE_CLOCK / BAUD_RATE;
-    UART4->BRR = (((uartdiv / 16) << USART_BRR_DIV_MANTISSA_Pos) | ((uartdiv % 16) << USART_BRR_DIV_FRACTION_Pos));
+    UART4->BRR = uartdiv;
 
     // enable the RX, TX and then enable the UART
     UART4->CR1 |= USART_CR1_RE;
@@ -41,6 +41,11 @@ void init_uart(void)
     UART4->CR1 |= USART_CR1_UE;
 }
 
+/**
+ * @brief Writes a single character
+ * 
+ * @param byte 
+ */
 void write_uart(char *byte)
 {
     // interrupt and status register
@@ -50,13 +55,17 @@ void write_uart(char *byte)
         // set current value
         // to prevent compiler from optimising this bit out
         isr = !(UART4->ISR & USART_ISR_TXE);
-    }
-    while (isr);
+    } while (isr);
 
     // transmite the byte
     UART4->TDR = *byte;
 }
 
+/**
+ * @brief Reads a single character
+ * 
+ * @return char 
+ */
 char read_uart(void)
 {
     // interrupt and status register
@@ -65,9 +74,9 @@ char read_uart(void)
     {
         // set current value
         // prevents compiler from optimising this loop out
-        isr = (!UART4->ISR & USART_ISR_RXNE);
+        isr = !(UART4->ISR & USART_ISR_RXNE);
     } while (isr);
-    
+
     // return the register value
     return UART4->RDR;
 }
