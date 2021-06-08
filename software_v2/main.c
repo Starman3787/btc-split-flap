@@ -8,6 +8,8 @@ void main(void)
     init_hall_effect_sensor();
     init_motor();
     init_systick();
+    init_uart();
+    init_wifi();
     while (1)
     {
 
