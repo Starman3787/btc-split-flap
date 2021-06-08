@@ -80,3 +80,16 @@ char read_uart(void)
     // return the register value
     return UART4->RDR;
 }
+
+void read_full_uart(char *message)
+{
+    char previousTwo[2] = {'\0', '\0'};
+    for (uint16_t i = 0; !(previousTwo[0] == '\r' && previousTwo[1] == '\n'); i++)
+    {
+        char currentValue = read_uart();
+        message[i] = currentValue;
+
+        previousTwo[0] = previousTwo[1];
+        previousTwo[1] = currentValue;
+    }
+}
