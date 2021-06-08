@@ -46,7 +46,7 @@ void init_uart(void)
  * 
  * @param byte 
  */
-void write_uart(char *byte)
+void write_uart(char byte)
 {
     // interrupt and status register
     uint16_t isr;
@@ -58,7 +58,7 @@ void write_uart(char *byte)
     } while (isr);
 
     // transmite the byte
-    UART4->TDR = *byte;
+    UART4->TDR = byte;
 }
 
 /**
