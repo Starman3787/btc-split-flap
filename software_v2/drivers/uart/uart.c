@@ -9,6 +9,7 @@
  * 
  */
 #include <stdint.h>
+#include <string.h>
 #include "../../headers/stm32f767xx.h"
 #include "../../headers/system_stm32f7xx.h"
 #include "./uart.h"
@@ -92,4 +93,14 @@ void read_full_uart(char *message)
         previousTwo[0] = previousTwo[1];
         previousTwo[1] = currentValue;
     }
+}
+
+void write_full_uart(char *message)
+{
+    for (uint16_t i = 0; i < strlen(message) - 1; i++)
+    {
+        write_uart(message[i]);
+    }
+    write_uart('\r');
+    write_uart('\n');
 }
