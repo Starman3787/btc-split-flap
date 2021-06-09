@@ -122,7 +122,6 @@ void read_full_uart(char *message)
 
 void write_full_uart(char *message)
 {
-    for (uint16_t i = 0; i < strlen(message) - 1; i++)
     for (uint16_t i = 0; i < strlen(message); i++)
     {
         write_uart(message[i]);
