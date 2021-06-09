@@ -21,25 +21,49 @@
 void init_uart(void)
 {
     // enable the UART4 clock as well as the GPIO clock
-    RCC->APB1ENR |= RCC_APB1ENR_UART4EN;
-    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
+    RCC->APB1ENR |= RCC_APB1ENR_UART4EN |
+                    RCC_APB1ENR_UART5EN;
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN |
+                    RCC_AHB1ENR_GPIOBEN;
 
     // set the alternate function
-    GPIOC->AFR[1] |= (0b1000 << ((uart_pins[0] - 8) * 4));
-    GPIOC->AFR[1] |= (0b1000 << ((uart_pins[1] - 8) * 4));
+    GPIOC->AFR[1] |= (0b1000 << ((uart_pins[0] - 8) * 4)) |
+                     (0b1000 << ((uart_pins[1] - 8) * 4));
+    GPIOB->AFR[1] |= (0b0111 << ((uart_pins[2] - 8) * 4)) |
+                     (0b0111 << ((uart_pins[3] - 8) * 4));
 
     // set the mode to alternate function
-    GPIOC->MODER |= (0b10 << (uart_pins[0] * 2));
-    GPIOC->MODER |= (0b10 << (uart_pins[1] * 2));
+    GPIOC->MODER |= (0b10 << (uart_pins[0] * 2)) |
+                    (0b10 << (uart_pins[1] * 2));
+    GPIOB->MODER |= (0b10 << (uart_pins[2] * 2)) |
+                    (0b10 << (uart_pins[3] * 2));
 
     // calculate and set the baud rate
     uint16_t uartdiv = CORE_CLOCK / BAUD_RATE;
     UART4->BRR = uartdiv;
 
     // enable the RX, TX and then enable the UART
-    UART4->CR1 |= USART_CR1_RE;
-    UART4->CR1 |= USART_CR1_TE;
-    UART4->CR1 |= USART_CR1_UE;
+    UART4->CR1 |= USART_CR1_RE |
+                  USART_CR1_TE |
+                  USART_CR1_UE;
+    UART5->CR1 |= USART_CR1_RE |
+                  USART_CR1_TE |
+                  USART_CR1_UE;
+}
+
+void print(char byte)
+{
+    // interrupt and status register
+    uint16_t isr;
+    do
+    {
+        // set current value
+        // to prevent compiler from optimising this bit out
+        isr = !(UART5->ISR & USART_ISR_TXE);
+    } while (isr);
+
+    // transmit the byte
+    UART5->TDR = byte;
 }
 
 /**

@@ -19,7 +19,9 @@
  */
 uint8_t uart_pins[] = {
     10,
-    11};
+    11,
+    9,
+    8};
 
 #define CORE_CLOCK      (16000000U)
 #define BAUD_RATE       (9600U)
