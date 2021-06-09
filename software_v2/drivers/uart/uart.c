@@ -83,7 +83,7 @@ void write_uart(char byte)
         isr = !(UART4->ISR & USART_ISR_TXE);
     } while (isr);
 
-    // transmite the byte
+    // transmit the byte
     UART4->TDR = byte;
 }
 
