@@ -9,6 +9,7 @@ void main(void)
     init_motor();
     init_systick();
     init_uart();
+    init_led();
     init_wifi();
     while (1)
     {
