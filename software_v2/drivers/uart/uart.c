@@ -123,9 +123,21 @@ void read_full_uart(char *message)
 void write_full_uart(char *message)
 {
     for (uint16_t i = 0; i < strlen(message) - 1; i++)
+    for (uint16_t i = 0; i < strlen(message); i++)
     {
         write_uart(message[i]);
     }
     write_uart('\r');
     write_uart('\n');
+}
+
+bool read_full_uart_and_expect(char *message)
+{
+    for (uint16_t i = 0; i < strlen(message); i++)
+    {
+        char currentValue = read_uart();
+        if (message[i] != currentValue)
+            return false;
+    }
+    return true;
 }
