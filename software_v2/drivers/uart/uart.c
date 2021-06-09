@@ -41,6 +41,7 @@ void init_uart(void)
     // calculate and set the baud rate
     uint16_t uartdiv = CORE_CLOCK / BAUD_RATE;
     UART4->BRR = uartdiv;
+    UART5->BRR = uartdiv;
 
     // enable the RX, TX and then enable the UART
     UART4->CR1 |= USART_CR1_RE |
