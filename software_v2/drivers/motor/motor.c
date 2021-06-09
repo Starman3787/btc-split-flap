@@ -19,22 +19,22 @@
 void init_motor(void)
 {
     // enable the GPIO clocks
-    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOFEN;
-    RCC->AHB1ENR |= RCC_AHB1ENR_GPIODEN;
-    
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOFEN |
+                    RCC_AHB1ENR_GPIODEN;
+
     // set the mode for all the enable pins
-    GPIOD->MODER |= (0b01 << (motor_enable_pins[0] * 2));
-    GPIOD->MODER |= (0b01 << (motor_enable_pins[1] * 2));
-    GPIOD->MODER |= (0b01 << (motor_enable_pins[2] * 2));
-    GPIOD->MODER |= (0b01 << (motor_enable_pins[3] * 2));
-    GPIOD->MODER |= (0b01 << (motor_enable_pins[4] * 2));
+    GPIOD->MODER |= (0b01 << (motor_enable_pins[0] * 2)) |
+                    (0b01 << (motor_enable_pins[1] * 2)) |
+                    (0b01 << (motor_enable_pins[2] * 2)) |
+                    (0b01 << (motor_enable_pins[3] * 2)) |
+                    (0b01 << (motor_enable_pins[4] * 2));
 
     // set the mode for all the step pins
-    GPIOF->MODER |= (0b01 << (motor_pins[0] * 2));
-    GPIOF->MODER |= (0b01 << (motor_pins[1] * 2));
-    GPIOF->MODER |= (0b01 << (motor_pins[2] * 2));
-    GPIOF->MODER |= (0b01 << (motor_pins[3] * 2));
-    GPIOF->MODER |= (0b01 << (motor_pins[4] * 2));
+    GPIOF->MODER |= (0b01 << (motor_pins[0] * 2)) |
+                    (0b01 << (motor_pins[1] * 2)) |
+                    (0b01 << (motor_pins[2] * 2)) |
+                    (0b01 << (motor_pins[3] * 2)) |
+                    (0b01 << (motor_pins[4] * 2));
 }
 
 /**
