@@ -10,6 +10,7 @@
  */
 #include <stdint.h>
 #include <string.h>
+#include <stdbool.h>
 #include "../../headers/stm32f767xx.h"
 #include "../../headers/system_stm32f7xx.h"
 #include "./uart.h"
@@ -65,6 +66,14 @@ void print(char byte)
 
     // transmit the byte
     UART5->TDR = byte;
+}
+
+void print_full(char *message)
+{
+    for (uint16_t i = 0; i < strlen(message); i++)
+        print(message[i]);
+    print('\r');
+    print('\n');
 }
 
 /**
