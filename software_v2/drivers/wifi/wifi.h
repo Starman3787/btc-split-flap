@@ -1,1 +1,2 @@
-#define GET_VERSION     ("AT+GMR")
+#define TEST            ("AT")
+#define HTTP_REQUEST    ("")
