@@ -1,2 +1,1 @@
-#define TEST            ("AT")
-#define HTTP_REQUEST    ("")
+#define TEST ("AT")
