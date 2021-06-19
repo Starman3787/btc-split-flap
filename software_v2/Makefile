@@ -40,7 +40,6 @@ LFLAGS += -mthumb
 LFLAGS += -Wall
 LFLAGS += -Wextra
 LFLAGS += --specs=nosys.specs
-LFLAGS += -nostdlib
 LFLAGS += -lgcc
 LFLAGS += -T$(LSCRIPT)
 
