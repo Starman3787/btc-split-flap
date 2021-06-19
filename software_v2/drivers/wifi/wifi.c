@@ -4,6 +4,51 @@
 #include <stdlib.h>
 #include "./wifi.h"
 
+void read_full_uart_until_json_property_match(char *property, char *value, size_t valueLength, uint8_t *counter)
+{
+    uint8_t matchingChars = 0;
+    while (matchingChars != strlen(property))
+    {
+        char currentValue = read_uart();
+        if (currentValue == property[matchingChars])
+        {
+            print(property[matchingChars]);
+            matchingChars++;
+        }
+        else
+            matchingChars = 0U;
+    }
+    if (read_full_uart_and_expect(":"))
+    {
+        bool endOfValue = false;
+        *counter = 0;
+        do
+        {
+            char currentValue = read_uart();
+            print(currentValue);
+            if (currentValue != ' ')
+            {
+                // THIS WILL STOP MID-STRING IF THERE IS A COMMA PRESENT
+                // MUST BE MODIFIED
+                // ONLY WORKS WITH NUMBERS FOR NOW
+                if (currentValue == ',')
+                {
+                    endOfValue = true;
+                }
+                else
+                {
+                    value[*counter] = currentValue;
+                    *counter += 1;
+                }
+            }
+        } while (!endOfValue && (*counter < valueLength));
+    }
+    else
+    {
+        print('5');
+    }
+}
+
 bool send_test_command(char *command)
 {
     write_full_uart(command);
