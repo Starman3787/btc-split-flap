@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
+#include <stdlib.h>
 #include "./wifi.h"
 
 bool send_test_command(char *command)
@@ -17,7 +18,7 @@ bool send_test_command(char *command)
 
 bool send_cip_start_command(char *protocol, char *host, char *port)
 {
-    char command[strlen("AT+CIPSTART=\"") + strlen(protocol) + strlen("\",\"") + strlen(host) + strlen("\",") + strlen(port) + 1];
+    char *command = malloc(strlen("AT+CIPSTART=\"") + strlen(protocol) + strlen("\",\"") + strlen(host) + strlen("\",") + strlen(port) + 1);
     command[0] = '\0';
     strcat(command, "AT+CIPSTART=\"");
     strcat(command, protocol);
@@ -34,12 +35,13 @@ bool send_cip_start_command(char *protocol, char *host, char *port)
         return false;
     if (read_full_uart_and_expect("OK\r\n") == false)
         return false;
+    free(command);
     return true;
 }
 
 bool send_cip_send_command(char *size, char *httpRequest)
 {
-    char command[strlen("AT+CIPSEND=") + strlen(size) + 1];
+    char *command = malloc(strlen("AT+CIPSEND=") + strlen(size) + 1);
     command[0] = '\0';
     strcat(command, "AT+CIPSEND=");
     strcat(command, size);
@@ -53,6 +55,7 @@ bool send_cip_send_command(char *size, char *httpRequest)
     if (read_full_uart_and_expect(">") == false)
         return false;
     write_full_uart(httpRequest);
+    free(command);
     return true;
 }
 
