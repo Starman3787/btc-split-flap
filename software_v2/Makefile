@@ -53,6 +53,7 @@ C_SRC += ./delay.c
 C_SRC += ./drivers/wifi/wifi.c
 C_SRC += ./drivers/uart/uart.c
 C_SRC += ./drivers/led/led.c
+C_SRC += ./util/status/status.c
 
 INCLUDE = -I./
 INCLUDE += -I./headers
