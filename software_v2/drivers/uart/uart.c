@@ -90,6 +90,7 @@ void write_uart(char byte)
         // set current value
         // to prevent compiler from optimising this bit out
         isr = !(UART4->ISR & USART_ISR_TXE);
+        status_loading_flash();
     } while (isr);
 
     // transmit the byte
@@ -110,6 +111,7 @@ char read_uart(void)
         // set current value
         // prevents compiler from optimising this loop out
         isr = !(UART4->ISR & USART_ISR_RXNE);
+        status_loading_flash();
     } while (isr);
 
     // return the register value

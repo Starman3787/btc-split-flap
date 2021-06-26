@@ -119,11 +119,11 @@ uint32_t fetch_price(void)
 
 void init_wifi(void)
 {
-    write_led(1, true);
+    status_loading(true);
     delay_ms(5000);
     if (send_test_command(TEST) == false)
-        write_led(2, true);
+        status_error(true);
     else
-        write_led(0, true);
+        status_ok(true);
     uint32_t price = fetch_price();
 }
