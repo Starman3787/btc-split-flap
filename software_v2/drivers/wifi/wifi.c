@@ -4,17 +4,14 @@
 #include <stdlib.h>
 #include "./wifi.h"
 
-void read_full_uart_until_json_property_match(char *property, char *value, size_t valueLength, uint8_t *counter)
+void read_full_uart_until_json_property_match(char *property, size_t propertyLength, char *value, size_t valueLength, uint8_t *counter)
 {
     uint8_t matchingChars = 0;
-    while (matchingChars != strlen(property))
+    while (matchingChars != propertyLength)
     {
         char currentValue = read_uart();
         if (currentValue == property[matchingChars])
-        {
-            print(property[matchingChars]);
             matchingChars++;
-        }
         else
             matchingChars = 0U;
     }
@@ -25,7 +22,6 @@ void read_full_uart_until_json_property_match(char *property, char *value, size_
         do
         {
             char currentValue = read_uart();
-            print(currentValue);
             if (currentValue != ' ')
             {
                 // THIS WILL STOP MID-STRING IF THERE IS A COMMA PRESENT
