@@ -100,6 +100,21 @@ bool send_cip_send_command(char *size, char *httpRequest)
     return true;
 }
 
+char *fetch_price(size_t maxLength)
+{
+    if (send_cip_start_command(PROTOCOL, HOST, PORT) == false)
+        write_led(2, true);
+    if (send_cip_send_command(REQUEST_SIZE, REQUEST) == false)
+        write_led(2, true);
+    char value[32];
+    uint8_t length;
+    read_full_uart_until_json_property_match("\"rate\"", 6, value, 32, &length);
+    char *finalValue = malloc(maxLength + 1);
+    strncpy(finalValue, value, maxLength);
+    finalValue[maxLength] = '\0';
+    return finalValue;
+}
+
 void init_wifi(void)
 {
     write_led(1, true);
@@ -108,8 +123,6 @@ void init_wifi(void)
         write_led(2, true);
     else
         write_led(0, true);
-    if (send_cip_start_command("TCP", "rest.coinapi.io", "80") == false)
-        write_led(2, true);
-    if (send_cip_send_command("143", HTTP_REQUEST) == false)
-        write_led(2, true);
+    char *price = fetch_price(5);
+    print_full(price);
 }
