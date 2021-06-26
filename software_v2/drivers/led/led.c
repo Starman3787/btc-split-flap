@@ -18,3 +18,8 @@ void write_led(uint8_t pin, bool state)
     else
         GPIOB->ODR &= ~(0b1 << led_pins[pin]);
 }
+
+void toggle_led(uint8_t pin)
+{
+    GPIOB->ODR ^= (0b1 << led_pins[pin]);
+}
