@@ -6,8 +6,8 @@
 
 - [x] Create motor driver
 - [x] Create hall effect sensor driver
-- [ ] Create UART driver
-- [ ] Create WiFi driver
+- [x] Create UART driver
+- [x] Create WiFi driver
 
 ### Other
 
