@@ -3,6 +3,7 @@
 
 void status_error(bool status)
 {
+    write_led(OK_PIN, false);
     write_led(ERROR_PIN, status);
 }
 
