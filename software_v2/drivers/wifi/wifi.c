@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include "./wifi.h"
 
-void read_full_uart_until_json_property_match(char *property, size_t propertyLength, char *value, size_t valueLength, uint8_t *counter)
+bool read_full_uart_until_json_property_match(char *property, size_t propertyLength, char *value, size_t valueLength, uint8_t *counter)
 {
     uint8_t matchingChars = 0;
     while (matchingChars != propertyLength)
@@ -28,20 +28,16 @@ void read_full_uart_until_json_property_match(char *property, size_t propertyLen
                 // MUST BE MODIFIED
                 // ONLY WORKS WITH NUMBERS FOR NOW
                 if (currentValue == ',')
-                {
                     endOfValue = true;
-                }
                 else
-                {
-                    value[*counter] = currentValue;
-                    *counter += 1;
-                }
+                    value[(*counter)++] = currentValue;
             }
         } while (!endOfValue && (*counter < valueLength));
+        return true;
     }
     else
     {
-        print('5');
+        return false;
     }
 }
 
@@ -108,13 +104,24 @@ uint32_t fetch_price(void)
         write_led(2, true);
     char value[32];
     uint8_t length;
-    read_full_uart_until_json_property_match("\"rate\"", 6, value, 32, &length);
-    char *finalValue = malloc(length + 1);
-    strncpy(finalValue, value, length);
-    finalValue[length] = '\0';
-    uint32_t price = strtoul(finalValue, finalValue + length + 1, 10);
-    free(finalValue);
-    return price;
+    if (read_full_uart_until_json_property_match("\"rate\"", 6, value, 32, &length) == true)
+    {
+        char *finalValue = malloc(length + 1);
+        strncpy(finalValue, value, length);
+        finalValue[length] = '\0';
+        char *pointer = finalValue + length + 1;
+        uint32_t price = strtoul(finalValue, &pointer, 10);
+        print_full(finalValue);
+        free(finalValue);
+        status_ok(true);
+        return price;
+    }
+    else
+    {
+        status_ok(false);
+        status_error(true);
+        return 0U;
+    }
 }
 
 void init_wifi(void)
