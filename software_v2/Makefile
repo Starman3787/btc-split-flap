@@ -54,6 +54,7 @@ C_SRC += ./drivers/wifi/wifi.c
 C_SRC += ./drivers/uart/uart.c
 C_SRC += ./drivers/led/led.c
 C_SRC += ./util/status/status.c
+C_SRC += ./drivers/split_flap/split_flap.c
 
 INCLUDE = -I./
 INCLUDE += -I./headers
