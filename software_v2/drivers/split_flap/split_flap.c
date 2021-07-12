@@ -10,7 +10,6 @@
  */
 #include <stdint.h>
 #include <stdbool.h>
-#include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
 #include "./split_flap.h"
