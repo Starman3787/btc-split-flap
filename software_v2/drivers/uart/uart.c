@@ -63,15 +63,21 @@ void print(char byte)
         // to prevent compiler from optimising this bit out
         isr = !(UART5->ISR & USART_ISR_TXE);
     } while (isr);
-
     // transmit the byte
     UART5->TDR = byte;
 }
 
+/**
+ * @brief Prints a full string to the UART
+ * 
+ * @param message The string to output to the UART
+ */
 void print_full(char *message)
 {
+    // iterate over the message and output each character one by one
     for (uint16_t i = 0; i < strlen(message); i++)
         print(message[i]);
+    // output the line termination sequence
     print('\r');
     print('\n');
 }
@@ -92,7 +98,6 @@ void write_uart(char byte)
         isr = !(UART4->ISR & USART_ISR_TXE);
         status_loading_flash();
     } while (isr);
-
     // transmit the byte
     UART4->TDR = byte;
 }
@@ -113,23 +118,38 @@ char read_uart(void)
         isr = !(UART4->ISR & USART_ISR_RXNE);
         status_loading_flash();
     } while (isr);
-
     // return the register value
     return UART4->RDR;
 }
 
+/**
+ * @brief Writes a full string to the UART
+ * 
+ * @param message The message to write to the UART
+ */
 void write_full_uart(char *message)
 {
+    // iterate over the message and output each character one by one
     for (uint16_t i = 0; i < strlen(message); i++)
         write_uart(message[i]);
+    // output the line termination sequence
     write_uart('\r');
     write_uart('\n');
 }
 
+/**
+ * @brief Reads from the UART, and expects a certain message
+ * 
+ * @param message The message to expect from the UART
+ * @return true The message from the UART matches the message provided
+ * @return false The message from the UART does not match the message provided
+ */
 bool read_full_uart_and_expect(char *message)
 {
+    // interate over every character of the expected message
     for (uint16_t i = 0; i < strlen(message); i++)
     {
+        // read the uart and check that the character matches
         char currentValue = read_uart();
         if (message[i] != currentValue)
             return false;

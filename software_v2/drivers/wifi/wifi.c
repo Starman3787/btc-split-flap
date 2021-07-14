@@ -1,9 +1,30 @@
+/**
+ * @file wifi.c
+ * @author Starman
+ * @brief Wifi functions for setting up the module and making requests
+ * @version 0.1
+ * @date 2021-07-14
+ * 
+ * @copyright Copyright (c) 2021
+ * 
+ */
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
 #include "./wifi.h"
 
+/**
+ * @brief Reads the incoming http json body data from the uart until a property is found, then will read and return the value
+ * 
+ * @param property The http json body property to find
+ * @param propertyLength The length of the http json body property
+ * @param value A pointer to a variable which should store the value
+ * @param valueLength The maximum length of the value to retrieve
+ * @param counter A pointer to a counter, so the actual length of the value can be determined
+ * @return true All expected values were read when expected
+ * @return false A character was expected, but was not returned
+ */
 bool read_full_uart_until_json_property_match(char *property, size_t propertyLength, char *value, size_t valueLength, uint8_t *counter)
 {
     uint8_t matchingChars = 0;
@@ -41,6 +62,13 @@ bool read_full_uart_until_json_property_match(char *property, size_t propertyLen
     }
 }
 
+/**
+ * @brief Send the test command to the ESP8266 wifi module, and check "OK" is returned
+ * 
+ * @param command The test command to send over uart
+ * @return true A response of "OK" was returned
+ * @return false An unexpected response was returned
+ */
 bool send_test_command(char *command)
 {
     write_full_uart(command);
@@ -53,6 +81,15 @@ bool send_test_command(char *command)
     return true;
 }
 
+/**
+ * @brief Sends the command to start the http request
+ * 
+ * @param protocol "TCP" or "UDP"
+ * @param host The host to send the request to
+ * @param port The port to send the request to
+ * @return true The command was sent successfully and the expected values were returned
+ * @return false An unexpected response was returned
+ */
 bool send_cip_start_command(char *protocol, char *host, char *port)
 {
     char *command = malloc(strlen("AT+CIPSTART=\"") + strlen(protocol) + strlen("\",\"") + strlen(host) + strlen("\",") + strlen(port) + 1);
@@ -76,6 +113,14 @@ bool send_cip_start_command(char *protocol, char *host, char *port)
     return true;
 }
 
+/**
+ * @brief Sends the command to make the http request
+ * 
+ * @param size The size of the request
+ * @param httpRequest The http request
+ * @return true The command was sent successfully and the expected values were returned
+ * @return false An unexpected response was returned
+ */
 bool send_cip_send_command(char *size, char *httpRequest)
 {
     char *command = malloc(strlen("AT+CIPSEND=") + strlen(size) + 1);
@@ -96,6 +141,11 @@ bool send_cip_send_command(char *size, char *httpRequest)
     return true;
 }
 
+/**
+ * @brief Combines other functions to make a request to the API to fetch the current price of Bitcoin
+ * 
+ * @return uint32_t The price
+ */
 uint32_t fetch_price(void)
 {
     if (send_cip_start_command(PROTOCOL, HOST, PORT) == false)
@@ -124,6 +174,10 @@ uint32_t fetch_price(void)
     }
 }
 
+/**
+ * @brief Initialises the wifi module
+ * 
+ */
 void init_wifi(void)
 {
     status_loading(true);
