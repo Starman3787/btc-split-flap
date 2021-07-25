@@ -146,7 +146,7 @@ void write_full_uart(char *message)
  */
 bool read_full_uart_and_expect(char *message)
 {
-    // interate over every character of the expected message
+    // iterate over every character of the expected message
     for (uint16_t i = 0; i < strlen(message); i++)
     {
         // read the uart and check that the character matches
