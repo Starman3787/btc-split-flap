@@ -75,8 +75,8 @@ void print(char byte)
 void print_full(char *message)
 {
     // iterate over the message and output each character one by one
-    for (uint16_t i = 0; i < strlen(message); i++)
-        print(message[i]);
+    while (*message != '\0')
+        print(*(message++));
     // output the line termination sequence
     print('\r');
     print('\n');
@@ -130,8 +130,8 @@ char read_uart(void)
 void write_full_uart(char *message)
 {
     // iterate over the message and output each character one by one
-    for (uint16_t i = 0; i < strlen(message); i++)
-        write_uart(message[i]);
+    while (*message != '\0')
+        write_uart(*(message++));
     // output the line termination sequence
     write_uart('\r');
     write_uart('\n');
@@ -147,11 +147,11 @@ void write_full_uart(char *message)
 bool read_full_uart_and_expect(char *message)
 {
     // iterate over every character of the expected message
-    for (uint16_t i = 0; i < strlen(message); i++)
+    while (*message != '\0')
     {
         // read the uart and check that the character matches
         char currentValue = read_uart();
-        if (message[i] != currentValue)
+        if (*(message++) != currentValue)
             return false;
     }
     return true;
