@@ -1,6 +1,6 @@
 #ifndef MAINH
 #define MAINH
 
-#define MODULE_COUNT        (2)
+#define MODULE_COUNT        (5)
 
 #endif
