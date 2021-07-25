@@ -15,6 +15,8 @@
  * 
  * PC10 - UART4_TX
  * PC11 - UART4_RX
+ * PB9  - UART5_TX
+ * PB8  - UART5_RX
  *
  */
 uint8_t uart_pins[] = {
