@@ -27,15 +27,7 @@
  */
 bool read_full_uart_until_json_property_match(char *property, size_t propertyLength, char *value, size_t valueLength, uint8_t *counter)
 {
-    uint8_t matchingChars = 0;
-    while (matchingChars != propertyLength)
-    {
-        char currentValue = read_uart();
-        if (currentValue == property[matchingChars])
-            matchingChars++;
-        else
-            matchingChars = 0U;
-    }
+    find_pattern(property, propertyLength);
     if (read_full_uart_and_expect(":"))
     {
         bool endOfValue = false;
@@ -59,6 +51,19 @@ bool read_full_uart_until_json_property_match(char *property, size_t propertyLen
     else
     {
         return false;
+    }
+}
+
+void find_pattern(char *pattern, size_t patternLength)
+{
+    uint8_t matchingChars = 0;
+    while (matchingChars != patternLength)
+    {
+        char currentValue = read_uart();
+        if (currentValue == *(pattern + matchingChars))
+            matchingChars++;
+        else
+            matchingChars = 0U;
     }
 }
 
