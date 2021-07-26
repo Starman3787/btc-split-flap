@@ -60,6 +60,7 @@ void find_pattern(char *pattern, size_t patternLength)
     while (matchingChars != patternLength)
     {
         char currentValue = read_uart();
+        print(currentValue);
         if (currentValue == *(pattern + matchingChars))
             matchingChars++;
         else
