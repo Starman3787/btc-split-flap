@@ -31,6 +31,12 @@ bool check_all_at_position(uint8_t *display_positions, uint8_t position)
     return true;
 }
 
+void set_all_positions(uint8_t *display_positions, uint8_t position)
+{
+    for (uint8_t i = 0; i < MODULE_COUNT; i++)
+        *(display_positions + i) = position;
+}
+
 /**
  * @brief Initialises each display by defining position 0 to a known position
  * 
@@ -38,6 +44,7 @@ bool check_all_at_position(uint8_t *display_positions, uint8_t position)
  */
 void init_split_flap(uint8_t *display_positions)
 {
+    set_all_positions(display_positions, 1);
     while (!check_all_at_position(display_positions, 0))
     {
         for (uint8_t i = 0; i < MODULE_COUNT; i++)
