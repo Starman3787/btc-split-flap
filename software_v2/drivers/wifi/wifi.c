@@ -170,8 +170,8 @@ uint32_t fetch_price(void)
         char *finalValue = malloc(length + 1);
         strncpy(finalValue, value, length);
         finalValue[length] = '\0';
-        char *pointer = finalValue + length + 1;
-        uint32_t price = strtoul(finalValue, &pointer, 10);
+        char *endOfFinalValueString = finalValue + length + 1;
+        uint32_t price = strtoul(finalValue, &endOfFinalValueString, 10);
         print_full(finalValue);
         free(finalValue);
         status_ok(true);
