@@ -167,6 +167,7 @@ uint32_t fetch_price(void)
     uint8_t length;
     if (read_full_uart_until_json_property_match("\"rate\"", 6, value, 32, &length) == true)
     {
+        find_pattern("CLOSED\r\n", 8);
         char *finalValue = malloc(length + 1);
         strncpy(finalValue, value, length);
         finalValue[length] = '\0';
