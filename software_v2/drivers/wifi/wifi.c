@@ -154,9 +154,15 @@ bool send_cip_send_command(char *size, char *httpRequest)
 uint32_t fetch_price(void)
 {
     if (send_cip_start_command(PROTOCOL, HOST, PORT) == false)
+    {
         write_led(2, true);
+        return 0U;
+    }
     if (send_cip_send_command(REQUEST_SIZE, REQUEST) == false)
+    {
         write_led(2, true);
+        return 0U;
+    }
     char value[32];
     uint8_t length;
     if (read_full_uart_until_json_property_match("\"rate\"", 6, value, 32, &length) == true)
