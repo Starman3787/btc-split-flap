@@ -16,7 +16,7 @@
  * 
  * @param milliseconds 
  */
-void delay_ms(uint16_t milliseconds)
+void delay_ms(uint32_t milliseconds)
 {
     // wraparound is not a problem here
     // the counter should run for 2^64 milliseconds
