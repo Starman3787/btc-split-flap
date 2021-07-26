@@ -197,5 +197,4 @@ void init_wifi(void)
         status_error(true);
     else
         status_ok(true);
-    uint32_t price = fetch_price();
 }
