@@ -194,7 +194,8 @@ uint32_t fetch_price(void)
 void init_wifi(void)
 {
     status_loading(true);
-    delay_ms(60000);
+    find_pattern("WIFI GOT IP\r\n", 13);
+    delay_ms(10000);
     if (send_test_command(TEST) == false)
         status_error(true);
     else
