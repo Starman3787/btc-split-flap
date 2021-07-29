@@ -32,12 +32,25 @@ bool check_all_at_position(uint8_t *display_positions, uint8_t position)
 }
 
 /**
+ * @brief Defines the position of all modules.
+ * 
+ * @param display_positions A pointer to an array of positions for each flap.
+ * @param position The position to define all modules to.
+ */
+void set_all_positions(uint8_t *display_positions, uint8_t position)
+{
+    for (uint8_t i = 0; i < MODULE_COUNT; i++)
+        *(display_positions + i) = position;
+}
+
+/**
  * @brief Initialises each display by defining position 0 to a known position
  * 
  * @param display_positions 
  */
 void init_split_flap(uint8_t *display_positions)
 {
+    set_all_positions(display_positions, 1);
     while (!check_all_at_position(display_positions, 0))
     {
         for (uint8_t i = 0; i < MODULE_COUNT; i++)

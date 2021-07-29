@@ -27,15 +27,7 @@
  */
 bool read_full_uart_until_json_property_match(char *property, size_t propertyLength, char *value, size_t valueLength, uint8_t *counter)
 {
-    uint8_t matchingChars = 0;
-    while (matchingChars != propertyLength)
-    {
-        char currentValue = read_uart();
-        if (currentValue == property[matchingChars])
-            matchingChars++;
-        else
-            matchingChars = 0U;
-    }
+    find_pattern(property, propertyLength);
     if (read_full_uart_and_expect(":"))
     {
         bool endOfValue = false;
@@ -59,6 +51,20 @@ bool read_full_uart_until_json_property_match(char *property, size_t propertyLen
     else
     {
         return false;
+    }
+}
+
+void find_pattern(char *pattern, size_t patternLength)
+{
+    uint8_t matchingChars = 0;
+    while (matchingChars != patternLength)
+    {
+        char currentValue = read_uart();
+        print(currentValue);
+        if (currentValue == *(pattern + matchingChars))
+            matchingChars++;
+        else
+            matchingChars = 0U;
     }
 }
 
@@ -149,18 +155,25 @@ bool send_cip_send_command(char *size, char *httpRequest)
 uint32_t fetch_price(void)
 {
     if (send_cip_start_command(PROTOCOL, HOST, PORT) == false)
+    {
         write_led(2, true);
+        return 0U;
+    }
     if (send_cip_send_command(REQUEST_SIZE, REQUEST) == false)
+    {
         write_led(2, true);
+        return 0U;
+    }
     char value[32];
     uint8_t length;
     if (read_full_uart_until_json_property_match("\"rate\"", 6, value, 32, &length) == true)
     {
+        find_pattern("CLOSED\r\n", 8);
         char *finalValue = malloc(length + 1);
         strncpy(finalValue, value, length);
         finalValue[length] = '\0';
-        char *pointer = finalValue + length + 1;
-        uint32_t price = strtoul(finalValue, &pointer, 10);
+        char *endOfFinalValueString = finalValue + length + 1;
+        uint32_t price = strtoul(finalValue, &endOfFinalValueString, 10);
         print_full(finalValue);
         free(finalValue);
         status_ok(true);
@@ -181,10 +194,10 @@ uint32_t fetch_price(void)
 void init_wifi(void)
 {
     status_loading(true);
-    delay_ms(5000);
+    find_pattern("WIFI GOT IP\r\n", 13);
+    delay_ms(10000);
     if (send_test_command(TEST) == false)
         status_error(true);
     else
         status_ok(true);
-    uint32_t price = fetch_price();
 }
