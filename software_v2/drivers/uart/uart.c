@@ -11,9 +11,11 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include "../../headers/stm32f767xx.h"
 #include "../../headers/system_stm32f7xx.h"
 #include "./uart.h"
+#include "../../timers/systick/systick.h"
 
 /**
  * @brief Initialises the UART pins
