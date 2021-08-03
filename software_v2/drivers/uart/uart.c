@@ -107,8 +107,9 @@ void write_uart(char byte)
  * 
  * @return char 
  */
-char read_uart(void)
+char read_uart(uint16_t timeout)
 {
+    uint16_t readUntil = ticks + timeout;
     // interrupt and status register
     uint16_t isr;
     do
@@ -117,6 +118,8 @@ char read_uart(void)
         // prevents compiler from optimising this loop out
         isr = !(UART4->ISR & USART_ISR_RXNE);
         status_loading_flash();
+        if (ticks > readUntil)
+            return NULL;
     } while (isr);
     // return the register value
     return UART4->RDR;
@@ -144,15 +147,19 @@ void write_full_uart(char *message)
  * @return true The message from the UART matches the message provided
  * @return false The message from the UART does not match the message provided
  */
-bool read_full_uart_and_expect(char *message)
+bool read_full_uart_and_expect(char *message, uint16_t timeout)
 {
     // iterate over every character of the expected message
     while (*message != '\0')
     {
         // read the uart and check that the character matches
-        char currentValue = read_uart();
+        char currentValue = read_uart(timeout);
+        print(currentValue);
+        if (currentValue == NULL)
+            return NULL;
         if (*(message++) != currentValue)
             return false;
     }
     return true;
+}
 }
