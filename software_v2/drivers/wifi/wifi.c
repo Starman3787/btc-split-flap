@@ -54,19 +54,6 @@ bool read_full_uart_until_json_property_match(char *property, size_t propertyLen
     }
 }
 
-void find_pattern(char *pattern, size_t patternLength)
-{
-    uint8_t matchingChars = 0;
-    while (matchingChars != patternLength)
-    {
-        char currentValue = read_uart();
-        print(currentValue);
-        if (currentValue == *(pattern + matchingChars))
-            matchingChars++;
-        else
-            matchingChars = 0U;
-    }
-}
 
 /**
  * @brief Send the test command to the ESP8266 wifi module, and check "OK" is returned

@@ -162,4 +162,17 @@ bool read_full_uart_and_expect(char *message, uint16_t timeout)
     }
     return true;
 }
+
+void find_pattern(char *pattern, size_t patternLength)
+{
+    uint8_t matchingChars = 0;
+    while (matchingChars != patternLength)
+    {
+        char currentValue = read_uart(10000);
+        print(currentValue);
+        if (currentValue == *(pattern + matchingChars))
+            matchingChars++;
+        else
+            matchingChars = 0U;
+    }
 }
