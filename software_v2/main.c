@@ -15,7 +15,7 @@ void main(void)
     print_full("UART started...");
     init_led();
     print_full("Initialising WiFi...");
-    init_wifi();
+    init_esp_01s();
 
     print_full("Starting...");
 
