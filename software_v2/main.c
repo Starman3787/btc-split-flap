@@ -3,6 +3,7 @@
 #include "./timers/systick/systick.h"
 #include "./main.h"
 volatile uint64_t ticks = 0;
+volatile time_t unix = 0;
 
 void main(void)
 {
