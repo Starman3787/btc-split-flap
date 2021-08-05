@@ -51,6 +51,23 @@ void set_all_positions(uint8_t *display_positions, uint8_t position)
 void init_split_flap(uint8_t *display_positions)
 {
     set_all_positions(display_positions, 1);
+    uint8_t notAtHome;
+    do
+    {
+        notAtHome = 0;
+        for (uint8_t i = 0; i < MODULE_COUNT; i++)
+            if (read_hall_effect_sensor(i))
+            {
+                write_motor(i);
+                write_motor(i);
+                if (!read_hall_effect_sensor(i))
+                    notAtHome++;
+            }
+            else
+                notAtHome++;
+        delay_ms(10);
+    }
+    while (notAtHome != MODULE_COUNT);
     while (!check_all_at_position(display_positions, 0))
     {
         for (uint8_t i = 0; i < MODULE_COUNT; i++)
