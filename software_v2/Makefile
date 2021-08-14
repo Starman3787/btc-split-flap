@@ -66,6 +66,12 @@ C_SRC += ./util/http/headers/split_header_values.c
 C_SRC += ./util/http/body/http_body_parser.c
 C_SRC += ./util/http/body/types/json.c
 C_SRC += ./util/http/body/encoding/chunked.c
+C_SRC += ./util/http/util/free_body.c
+C_SRC += ./util/http/util/free_headers.c
+C_SRC += ./util/http/util/free_http.c
+C_SRC += ./util/http/util/free_json.c
+C_SRC += ./modes/test.c
+C_SRC += ./modes/btc.c
 
 INCLUDE = -I./
 INCLUDE += -I./headers
