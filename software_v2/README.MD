@@ -11,7 +11,7 @@
 
 ### Other
 
-- [ ] Fetch current bitcoin value and display using the split flap
+- [x] Fetch current bitcoin value and display using the split flap
 - [ ] Create a webserver to allow for control over the split flap from another device
 - [ ] Option to display the time
 
