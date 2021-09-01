@@ -8,8 +8,8 @@
  * @copyright Copyright (c) 2021
  * 
  */
-#ifndef _MODES_TEST_H
-#define _MODES_TEST_H
+#ifndef MODES_TEST_H_
+#define MODES_TEST_H_
 
 void mode_test(void);
 

@@ -8,8 +8,8 @@
  * @copyright Copyright (c) 2021
  * 
  */
-#ifndef _DRIVERS_ESP_01S_H
-#define _DRIVERS_ESP_01S_H
+#ifndef DRIVERS_ESP_01S_H_
+#define DRIVERS_ESP_01S_H_
 
 #include <stdint.h>
 #include "util/http/http.h"

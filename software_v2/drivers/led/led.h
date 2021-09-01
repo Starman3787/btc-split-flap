@@ -8,8 +8,8 @@
  * @copyright Copyright (c) 2021
  * 
  */
-#ifndef _DRIVERS_LED_H
-#define _DRIVERS_LED_H
+#ifndef DRIVERS_LED_H_
+#define DRIVERS_LED_H_
 
 #include <stdint.h>
 

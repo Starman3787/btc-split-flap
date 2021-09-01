@@ -1,5 +1,5 @@
-#ifndef _UTIL_HTTP_H
-#define _UTIL_HTTP_H
+#ifndef UTIL_HTTP_H_
+#define UTIL_HTTP_H_
 
 #include <stdint.h>
 #include <ctype.h>

@@ -8,8 +8,8 @@
  * @copyright Copyright (c) 2021
  * 
  */
-#ifndef _DRIVERS_MOTOR_H
-#define _DRIVERS_MOTOR_H
+#ifndef DRIVERS_MOTOR_H_
+#define DRIVERS_MOTOR_H_
 
 #include <stdint.h>
 

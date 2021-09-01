@@ -1,5 +1,5 @@
-#ifndef _UTIL_PARSE_DATE_H
-#define _UTIL_PARSE_DATE_H
+#ifndef UTIL_PARSE_DATE_H_
+#define UTIL_PARSE_DATE_H_
 
 #include <stdint.h>
 #include <string.h>

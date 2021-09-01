@@ -1,5 +1,5 @@
-#ifndef HEX_TO_INT_H
-#define HEX_TO_INT_H
+#ifndef UTIL_HTTP_UTIL_HEX_TO_INT_H_
+#define UTIL_HTTP_UTIL_HEX_TO_INT_H_
 
 #include <ctype.h>
 #include <stdint.h>

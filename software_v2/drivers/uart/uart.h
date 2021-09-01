@@ -8,8 +8,8 @@
  * @copyright Copyright (c) 2021
  * 
  */
-#ifndef _DRIVERS_UART_H
-#define _DRIVERS_UART_H
+#ifndef DRIVERS_UART_H_
+#define DRIVERS_UART_H_
 
 #include <stdint.h>
 #include <stdbool.h>

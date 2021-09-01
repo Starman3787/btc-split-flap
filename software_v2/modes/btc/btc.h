@@ -8,8 +8,8 @@
  * @copyright Copyright (c) 2021
  * 
  */
-#ifndef _MODES_BTC_H
-#define _MODES_BTC_H
+#ifndef MODES_BTC_H_
+#define MODES_BTC_H_
 
 void mode_btc(void);
 

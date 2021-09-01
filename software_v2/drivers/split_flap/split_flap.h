@@ -8,8 +8,8 @@
  * @copyright Copyright (c) 2021
  * 
  */
-#ifndef _DRIVERS_SPLIT_FLAP_H
-#define _DRIVERS_SPLIT_FLAP_H
+#ifndef DRIVERS_SPLIT_FLAP_H_
+#define DRIVERS_SPLIT_FLAP_H_
 
 #define FLAPS           (40) /* number of flaps on each module */
 #define STEPS           (200) /* number of steps on each stepper motor */

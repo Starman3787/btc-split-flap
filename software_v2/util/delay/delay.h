@@ -8,8 +8,8 @@
  * @copyright Copyright (c) 2021
  * 
  */
-#ifndef _UTIL_DELAY_H
-#define _UTIL_DELAY_H
+#ifndef UTIL_DELAY_H_
+#define UTIL_DELAY_H_
 
 #include <stdint.h>
 

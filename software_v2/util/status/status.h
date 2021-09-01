@@ -8,8 +8,8 @@
  * @copyright Copyright (c) 2021
  * 
  */
-#ifndef _UTIL_STATUS_H
-#define _UTIL_STATUS_H
+#ifndef UTIL_STATUS_H_
+#define UTIL_STATUS_H_
 
 #define ERROR_PIN       (2U)
 #define LOADING_PIN     (1U)
