@@ -78,9 +78,8 @@ bool send_cip_send_command(char *size, char *httpRequest)
     return true;
 }
 
-Http *response_parser(void)
+void response_parser(Http *response)
 {
-    ChunkReference **responseChunks = malloc(sizeof(ChunkReference) * 10);
     uint8_t totalChunks = 0;
     size_t currentResponseSize = 1;
     find_pattern("+IPD,", 5);
@@ -88,7 +87,7 @@ Http *response_parser(void)
     {
         totalChunks++;
         if (totalChunks > 10)
-            responseChunks = realloc(responseChunks, sizeof(ChunkReference) * totalChunks);
+            break;
         uint16_t currentChunkLength;
         char currentCharacter = read_uart(1000U);
         print(currentCharacter);
@@ -105,19 +104,15 @@ Http *response_parser(void)
         char *endOfRawChunkLengthString = rawChunkLength + counter + 1;
         currentChunkLength = strtoul(rawChunkLength, &endOfRawChunkLengthString, 10);
         free(rawChunkLength);
-        char *chunk = malloc(sizeof(char) * (currentChunkLength + 1));
         uint16_t bodyCounter;
         for (bodyCounter = 0; bodyCounter < currentChunkLength; bodyCounter++)
         {   
-            *(chunk + bodyCounter) = read_uart(1500U);
-            print(*(chunk + bodyCounter));
+            rawResponseChunks[totalChunks - 1].chunkData[bodyCounter] = read_uart(1500U);
+            print(rawResponseChunks[totalChunks - 1].chunkData[bodyCounter]);
         }
-        *(chunk + currentChunkLength) = '\0';
+        rawResponseChunks[totalChunks - 1].chunkData[currentChunkLength] = '\0';
+        rawResponseChunks[totalChunks - 1].chunkLength = currentChunkLength;
         currentResponseSize += currentChunkLength;
-        ChunkReference *current = malloc(sizeof(ChunkReference) * 1);
-        current->chunkData = chunk;
-        current->chunkLength = currentChunkLength;
-        *(responseChunks + (totalChunks - 1)) = current;
         char firstChar = read_uart(1000U);
         if (firstChar == '\r')
         {
@@ -144,39 +139,34 @@ Http *response_parser(void)
     for (uint8_t i = 0; i < totalChunks; i++)
     {
         printf("%d\n", i);
-        strncat(fullRawResponse, (*(responseChunks + i))->chunkData, (*(responseChunks + i))->chunkLength);
+        strncat(fullRawResponse, rawResponseChunks[i].chunkData, rawResponseChunks[i].chunkLength);
         puts("concat'd");
-        free((*(responseChunks + i))->chunkData);
-        puts("freed 0");
-        free(*(responseChunks + i));
-        puts("freed 1");
     }
-    free(responseChunks);
     puts("freed 2");
     *(fullRawResponse + currentResponseSize) = '\0';
     puts("added null characters");
-    Http *parsedHttp = parse_http(fullRawResponse);
+    parse_http(fullRawResponse, response);
     puts("parsed http");
     free(fullRawResponse);
     puts("freed 3");
-    Header *currentTimeString = find_header(parsedHttp->headers, parsedHttp->headersLength, "date");
+    Header *currentTimeString = find_header(response->headers, response->headersLength, "date");
     puts("got time");
     unix = parse_date(currentTimeString->value);
     puts(currentTimeString->value);
-    return parsedHttp;
 }
 
-Http *make_http_request(char *protocol, char *host, char *port, char *size, char *httpRequest)
+int8_t make_http_request(char *protocol, char *host, char *port, char *size, char *httpRequest, Http *response)
 {
     if (send_cip_start_command(protocol, host, port) != true)
     {
         status_error(true);
-        return NULL;
+        return -1;
     }
     if (send_cip_send_command(size, httpRequest) != true)
     {
         status_error(true);
-        return NULL;
+        return -1;
     }
-    return response_parser();
+    response_parser(response);
+    return 0;
 }

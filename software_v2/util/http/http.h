@@ -70,7 +70,7 @@ Json **parse_json(char *body, size_t *size);
 char **split_header_values(char *headerValue, uint8_t *values, const char splitBy);
 
 /* Front-facing API */
-Http *parse_http(char *rawHttp);
+void parse_http(char *rawHttp, Http *parsedHttp);
 Header *find_header(Header **headers, uint8_t headersLength, char *key);
 uint16_t http_response_status(char *rawHttp);
 Header **http_header_parser(char *rawHttp, uint8_t *headerIndex, char **headersEnd);
@@ -78,7 +78,7 @@ Body *http_body_parser(char *rawBody, Header **headers, uint8_t headersLength);
 
 void free_body(Body **parsedBody);
 void free_headers(Header ***headers, uint8_t headersLength);
-void free_http(Http **parsedHttp);
+void free_http(Http *parsedHttp);
 void free_json(Json ***jsonBody, size_t child_size);
 
 #endif

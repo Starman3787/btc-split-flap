@@ -14,12 +14,14 @@
 #include <stdint.h>
 #include "util/http/http.h"
 
-typedef struct chunkReference {
-    char *chunkData;
+typedef struct chunkData {
+    char chunkData[1461];
     uint16_t chunkLength;
-} ChunkReference;
+} ChunkData;
+
+ChunkData rawResponseChunks[10];
 
 void init_esp_01s(void);
-Http *make_http_request(char *protocol, char *host, char *port, char *size, char *httpRequest);
+int8_t make_http_request(char *protocol, char *host, char *port, char *size, char *httpRequest, Http *response);
 
 #endif

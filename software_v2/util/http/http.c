@@ -3,10 +3,9 @@
 #include <stdio.h>
 #include "util/http/http.h"
 
-Http *parse_http(char *rawHttp)
+void parse_http(char *rawHttp, Http *parsedHttp)
 {
     puts("parse_http init alloc");
-    Http *parsedHttp = malloc(sizeof(Http));
     puts("parse_http init alloc'd");
     parsedHttp->statusCode = http_response_status(rawHttp);
     printf("found http status of %d\n", parsedHttp->statusCode);
@@ -20,5 +19,4 @@ Http *parse_http(char *rawHttp)
     puts("parsing body now");
     parsedHttp->responseBody = http_body_parser(headersEnd, parsedHttp->headers, headersLength);
     puts("body parsed");
-    return parsedHttp;
 }
