@@ -12,8 +12,11 @@
 #include <stdbool.h>
 #include <ctype.h>
 #include <string.h>
-#include "./split_flap.h"
-#include "../main.h"
+#include "drivers/split_flap/split_flap.h"
+#include "drivers/hall_effect_sensor/hall_effect_sensor.h"
+#include "drivers/motor/motor.h"
+#include "util/delay/delay.h"
+#include "../../main.h"
 
 /**
  * @brief Checks all positions of the motors to see if they match the specified position

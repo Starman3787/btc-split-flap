@@ -14,8 +14,24 @@
 #include <stdio.h>
 #include "../../headers/stm32f767xx.h"
 #include "../../headers/system_stm32f7xx.h"
-#include "./uart.h"
-#include "../../timers/systick/systick.h"
+#include "drivers/uart/uart.h"
+#include "timers/systick/systick.h"
+#include "util/status/status.h"
+
+/**
+ * Pin  - Motor
+ * 
+ * PC10 - UART4_TX
+ * PC11 - UART4_RX
+ * PB9  - UART5_TX
+ * PB8  - UART5_RX
+ *
+ */
+uint8_t uart_pins[4] = {
+    10,
+    11,
+    9,
+    8};
 
 /**
  * @brief Initialises the UART pins
@@ -111,7 +127,7 @@ void write_uart(char byte)
  */
 char read_uart(uint16_t timeout)
 {
-    uint16_t readUntil = ticks + timeout;
+    uint64_t readUntil = ticks + (uint64_t)timeout;
     // interrupt and status register
     uint16_t isr;
     do
@@ -121,7 +137,7 @@ char read_uart(uint16_t timeout)
         isr = !(UART4->ISR & USART_ISR_RXNE);
         status_loading_flash();
         if (ticks > readUntil)
-            return NULL;
+            return '\0';
     } while (isr);
     // return the register value
     return UART4->RDR;
@@ -156,21 +172,21 @@ bool read_full_uart_and_expect(char *message, uint16_t timeout)
     {
         // read the uart and check that the character matches
         char currentValue = read_uart(timeout);
-        print(currentValue);
-        if (currentValue == NULL)
-            return NULL;
+        // print(currentValue == '\r' || currentValue == '\n' ? currentValue == '\r' ? 'r' : 'n' : currentValue);
+        if (currentValue == '\0')
+            return false;
         if (*(message++) != currentValue)
             return false;
     }
     return true;
 }
 
-void find_pattern(char *pattern, size_t patternLength)
+void find_pattern(char *pattern, uint16_t patternLength)
 {
     uint8_t matchingChars = 0;
     while (matchingChars != patternLength)
     {
-        char currentValue = read_uart(10000);
+        char currentValue = read_uart(20000U);
         print(currentValue);
         if (currentValue == *(pattern + matchingChars))
             matchingChars++;

@@ -10,6 +10,7 @@
  */
 #include "../../headers/stm32f767xx.h"
 #include "../../headers/CMSIS/core_cm7.h"
+#include "timers/systick/systick.h"
 
 /**
  * @brief Initialises and starts the SysTick

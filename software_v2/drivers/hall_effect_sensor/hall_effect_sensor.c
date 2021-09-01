@@ -11,7 +11,24 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "../../headers/stm32f767xx.h"
-#include "./hall_effect_sensor.h"
+#include "drivers/hall_effect_sensor/hall_effect_sensor.h"
+
+/**
+ * Pin  - Sensor
+ * 
+ * PE2  - 0
+ * PE3  - 1
+ * PE4  - 2
+ * PE5  - 3
+ * PE6  - 4
+ *
+ */
+uint8_t hall_effect_sensor_pins[5] = {
+    2,
+    3,
+    4,
+    5,
+    6};
 
 /**
  * @brief Initialises the hall effect sensor by setting the mode

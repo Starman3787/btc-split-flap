@@ -2,7 +2,14 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
-#include "../../util/http/http.h"
+#include <stdio.h>
+#include "util/http/http.h"
+#include "util/delay/delay.h"
+#include "util/time/parse_date.h"
+#include "util/status/status.h"
+#include "timers/systick/systick.h"
+#include "drivers/uart/uart.h"
+#include "drivers/esp_01s/esp_01s.h"
 
 bool esp_01s_test(void)
 {
@@ -71,16 +78,19 @@ bool send_cip_send_command(char *size, char *httpRequest)
     return true;
 }
 
-char *response_parser(void)
+Http *response_parser(void)
 {
-    char *fullRawResponse = malloc(sizeof(char) * 1);
-    *fullRawResponse = '\0';
+    ChunkReference **responseChunks = malloc(sizeof(ChunkReference) * 10);
+    uint8_t totalChunks = 0;
     size_t currentResponseSize = 1;
-    uint16_t responseStart = find_pattern("+IPD,", 5);
+    find_pattern("+IPD,", 5);
     while (1)
     {
+        totalChunks++;
+        if (totalChunks > 10)
+            responseChunks = realloc(responseChunks, sizeof(ChunkReference) * totalChunks);
         uint16_t currentChunkLength;
-        char currentCharacter = read_uart(1000);
+        char currentCharacter = read_uart(1000U);
         print(currentCharacter);
         char *rawChunkLength = malloc(sizeof(char) * 2);
         uint8_t counter;
@@ -89,45 +99,84 @@ char *response_parser(void)
             rawChunkLength = realloc(rawChunkLength, sizeof(char) * (counter + 2));
             *(rawChunkLength + counter) = currentCharacter;
             *(rawChunkLength + counter + 1) = '\0';
-            currentCharacter = read_uart(10000);
+            currentCharacter = read_uart(1500U);
             print(currentCharacter);
         }
         char *endOfRawChunkLengthString = rawChunkLength + counter + 1;
-        currentChunkLength = strtoul(rawChunkLength, &endOfRawChunkLengthString, 10) + 1;
+        currentChunkLength = strtoul(rawChunkLength, &endOfRawChunkLengthString, 10);
         free(rawChunkLength);
-        char *chunk = malloc(sizeof(char) * currentChunkLength);
+        char *chunk = malloc(sizeof(char) * (currentChunkLength + 1));
         uint16_t bodyCounter;
-        for (bodyCounter = 0; bodyCounter < currentChunkLength - 1; bodyCounter++)
+        for (bodyCounter = 0; bodyCounter < currentChunkLength; bodyCounter++)
         {   
-            *(chunk + bodyCounter) = read_uart(10000);
+            *(chunk + bodyCounter) = read_uart(1500U);
             print(*(chunk + bodyCounter));
         }
-        *(chunk + currentChunkLength - 1) = '\0';
-        currentResponseSize += currentChunkLength - 1;
-        fullRawResponse = realloc(fullRawResponse, sizeof(char) * currentResponseSize);
-        strcat(fullRawResponse, chunk);
-        free(chunk);
-        *(fullRawResponse + currentResponseSize + currentChunkLength - 1) = '\0';
-        if (read_full_uart_and_expect("\r\n+IPD,", 10000) != true)
+        *(chunk + currentChunkLength) = '\0';
+        currentResponseSize += currentChunkLength;
+        ChunkReference *current = malloc(sizeof(ChunkReference) * 1);
+        current->chunkData = chunk;
+        current->chunkLength = currentChunkLength;
+        *(responseChunks + (totalChunks - 1)) = current;
+        char firstChar = read_uart(1000U);
+        if (firstChar == '\r')
+        {
+            if (read_full_uart_and_expect("\n+IPD,", 10000UL) != true)
+            {
+                puts("NOT TRUE");
+                break;
+            }
+        }
+        else if (firstChar == 'C')
+        {
+            find_pattern("LOSED\r\n", 7);
             break;
-        responseStart = responseStart + counter + 1 + bodyCounter + 7;
+        }
+        else
+        {
+            print('C');
+        }
     }
-    return fullRawResponse;
+    puts("END OF RESPONSE");
+    char *fullRawResponse = malloc(sizeof(char) * currentResponseSize);
+    *fullRawResponse = '\0';
+    puts("143");
+    for (uint8_t i = 0; i < totalChunks; i++)
+    {
+        printf("%d\n", i);
+        strncat(fullRawResponse, (*(responseChunks + i))->chunkData, (*(responseChunks + i))->chunkLength);
+        puts("concat'd");
+        free((*(responseChunks + i))->chunkData);
+        puts("freed 0");
+        free(*(responseChunks + i));
+        puts("freed 1");
+    }
+    free(responseChunks);
+    puts("freed 2");
+    *(fullRawResponse + currentResponseSize) = '\0';
+    puts("added null characters");
+    Http *parsedHttp = parse_http(fullRawResponse);
+    puts("parsed http");
+    free(fullRawResponse);
+    puts("freed 3");
+    Header *currentTimeString = find_header(parsedHttp->headers, parsedHttp->headersLength, "date");
+    puts("got time");
+    unix = parse_date(currentTimeString->value);
+    puts(currentTimeString->value);
+    return parsedHttp;
 }
 
 Http *make_http_request(char *protocol, char *host, char *port, char *size, char *httpRequest)
 {
     if (send_cip_start_command(protocol, host, port) != true)
     {
-        write_led(2, true);
-        return 0U;
+        status_error(true);
+        return NULL;
     }
     if (send_cip_send_command(size, httpRequest) != true)
     {
-        write_led(2, true);
-        return 0U;
+        status_error(true);
+        return NULL;
     }
-    char *response = response_parser();
-    print_full(response);
-    return parse_http(response);
+    return response_parser();
 }

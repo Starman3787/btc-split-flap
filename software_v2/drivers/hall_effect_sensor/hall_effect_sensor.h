@@ -1,3 +1,5 @@
+#ifndef _DRIVERS_HALL_EFFECT_SENSOR_H
+#define _DRIVERS_HALL_EFFECT_SENSOR_H
 /**
  * @file hall_effect_sensor.h
  * @author Starman
@@ -10,19 +12,9 @@
  */
 #include <stdint.h>
 
-/**
- * Pin  - Sensor
- * 
- * PE2  - 0
- * PE3  - 1
- * PE4  - 2
- * PE5  - 3
- * PE6  - 4
- *
- */
-uint8_t hall_effect_sensor_pins[] = {
-    2,
-    3,
-    4,
-    5,
-    6};
+extern uint8_t hall_effect_sensor_pins[5];
+
+void init_hall_effect_sensor(void);
+bool read_hall_effect_sensor(uint16_t sensor);
+
+#endif

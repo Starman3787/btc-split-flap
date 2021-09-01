@@ -10,7 +10,41 @@
  */
 #include <stdint.h>
 #include "../../headers/stm32f767xx.h"
-#include "./motor.h"
+#include "drivers/motor/motor.h"
+
+/**
+ * Pin  - Motor
+ * 
+ * PF7  - 0
+ * PF8  - 1
+ * PF9  - 2
+ * PF10 - 3
+ * PF15 - 4
+ *
+ */
+uint8_t motor_pins[5] = {
+    7,
+    8,
+    9,
+    10,
+    15};
+
+/**
+ * Pin  - Motor
+ * 
+ * PD0  - 0
+ * PD1  - 1
+ * PD2  - 2
+ * PD3  - 3
+ * PD4  - 4
+ * 
+ */
+uint8_t motor_enable_pins[5] = {
+    0,
+    1,
+    2,
+    3,
+    4};
 
 /**
  * @brief Initialises the motor by setting the mode for both the enable and step pins

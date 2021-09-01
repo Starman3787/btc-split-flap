@@ -8,17 +8,15 @@
  * @copyright Copyright (c) 2021
  * 
  */
+#ifndef _DRIVERS_LED_H
+#define _DRIVERS_LED_H
+
 #include <stdint.h>
 
-/**
- * Pin  - Led
- * 
- * PB0  - Green
- * PB7  - Blue
- * PB14 - Red
- * 
- */
-uint8_t led_pins[] = {
-    0,
-    7,
-    14};
+extern uint8_t led_pins[3];
+
+void init_led(void);
+void write_led(uint8_t pin, bool state);
+void toggle_led(uint8_t pin);
+
+#endif

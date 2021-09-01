@@ -1,4 +1,7 @@
 #include <stdint.h>
+#include "util/delay/delay.h"
+#include "drivers/motor/motor.h"
+#include "drivers/split_flap/split_flap.h"
 
 void mode_test(void)
 {
@@ -12,7 +15,7 @@ void mode_test(void)
 
     delay_ms(1000);
 
-    const char *strings[] = {
+    char *strings[] = {
         "APPLE",
         "ABOUT",
         "ABUSE",

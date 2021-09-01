@@ -8,8 +8,7 @@
  * @copyright Copyright (c) 2021
  * 
  */
-#include <stdio.h>
-#include "./systick.h"
+#include "timers/systick/systick.h"
 
 /**
  * @brief SysTick interrupt handler, is called every millisecond

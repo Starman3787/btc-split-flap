@@ -1,31 +1,13 @@
-#ifndef PARSE_DATE_H
-#define PARSE_DATE_H
+#ifndef _UTIL_PARSE_DATE_H
+#define _UTIL_PARSE_DATE_H
 
 #include <stdint.h>
 #include <string.h>
 #include <stdio.h>
 
-const char months[12][4] = {
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec"
-};
+extern const char months[12][4];
 
-int8_t convertMonth(const char *month)
-{
-    for (int8_t i = 0; i < sizeof(months) / 4; i++)
-        if (strcmp(month, months[i]) == 0)
-            return i;
-    return NULL;
-}
+int8_t convertMonth(const char *month);
+time_t parse_date(char *date);
 
 #endif

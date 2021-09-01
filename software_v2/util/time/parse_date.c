@@ -6,6 +6,29 @@
 #include <stdlib.h>
 #include "./parse_date.h"
 
+const char months[12][4] = {
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec"
+};
+
+int8_t convertMonth(const char *month)
+{
+    for (int8_t i = 0; i < sizeof(months) / 4; i++)
+        if (strcmp(month, months[i]) == 0)
+            return i;
+    return 0;
+}
+
 /**
  * @brief Parses a HTTP "Date" header, specified here: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Date
  * 
@@ -15,7 +38,6 @@
 time_t parse_date(char *date)
 {
     struct tm t;
-    time_t t_of_day;
     t.tm_isdst = 0;
     date += 4;
     char *mday = malloc(sizeof(char) * 1);

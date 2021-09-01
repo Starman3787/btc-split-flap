@@ -9,7 +9,8 @@
  * 
  */
 #include <stdbool.h>
-#include "./status.h"
+#include "util/status/status.h"
+#include "drivers/led/led.h"
 
 /**
  * @brief Switches the red LED on

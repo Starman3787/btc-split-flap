@@ -4,11 +4,12 @@
 #include <ctype.h>
 #include <stdint.h>
 #include <string.h>
-#include "../http.h"
+#include "util/http/http.h"
+#include "../util/to_lower_case.h"
 
-Header *find_header(Header **headers, uint8_t headersLength, const char *key)
+Header *find_header(Header **headers, uint8_t headersLength, char *key)
 {
-    for (; headersLength--; *(headers++))
+    for (; headersLength--; headers++)
         if (strcmp((*headers)->key, key) == 0)
             return *headers;
     return NULL;

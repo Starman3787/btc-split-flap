@@ -10,7 +10,20 @@
  */
 #include <stdbool.h>
 #include "../../headers/stm32f767xx.h"
-#include "./led.h"
+#include "drivers/led/led.h"
+
+/**
+ * Pin  - Led
+ * 
+ * PB0  - Green
+ * PB7  - Blue
+ * PB14 - Red
+ * 
+ */
+uint8_t led_pins[3] = {
+    0,
+    7,
+    14};
 
 /**
  * @brief Initialises the LEDs

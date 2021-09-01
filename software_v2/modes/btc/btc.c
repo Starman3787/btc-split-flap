@@ -1,12 +1,16 @@
 #include <stdio.h>
-#include "../util/http/http.h"
-#include "../drivers/wifi/wifi.h"
-#include "../drivers/split_flap/split_flap.h"
-#include "../timers/systick/systick.h"
+#include <string.h>
+#include "util/http/http.h"
+#include "drivers/wifi/wifi.h"
+#include "drivers/split_flap/split_flap.h"
+#include "drivers/esp_01s/esp_01s.h"
+#include "drivers/motor/motor.h"
+#include "timers/systick/systick.h"
+#include "util/delay/delay.h"
 
 void mode_btc(void)
 {
-    print_full("Fetching price...");
+    puts("Fetching price...");
 
     // fetch price and convert it to a string
     Http *parsedHttp = make_http_request(PROTOCOL, HOST, PORT, REQUEST_SIZE, REQUEST);
@@ -50,17 +54,11 @@ void mode_btc(void)
                 rate = element->data.json_number;
         }
 
-        char priceString[6];
-        sprintf(priceString, "%llu", rate);
-        print_full(priceString);
+        printf("PRICE: %llu\n", rate);
 
-        char timeString[11];
-        sprintf(timeString, "%lli", unix);
-        print_full(timeString);
+        printf("UNIX_TIME: %lli\n", unix);
 
-        char timeStringTicks[13];
-        sprintf(timeStringTicks, "%llu", ticks);
-        print_full(timeStringTicks);
+        printf("STARTUP_TIME: %llu\n", ticks);
 
         // enable all motors
         toggle_motor(0);
@@ -76,6 +74,8 @@ void mode_btc(void)
         init_split_flap();
 
         // display the message on the split flap display
+        char priceString[6];
+        sprintf(priceString, "%llu", rate);
         display_message(priceString);
 
         // give the motors a second to stabilise
