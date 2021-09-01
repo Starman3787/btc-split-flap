@@ -32,19 +32,14 @@ void init_esp_01s(void)
 
 bool send_cip_start_command(char *protocol, char *host, char *port)
 {
-    char *command = malloc(strlen("AT+CIPSTART=\"") + strlen(protocol) + strlen("\",\"") + strlen(host) + strlen("\",") + strlen(port) + 1);
-    command[0] = '\0';
-    strcat(command, "AT+CIPSTART=\"");
-    strcat(command, protocol);
-    strcat(command, "\",\"");
-    strcat(command, host);
-    strcat(command, "\",");
-    strcat(command, port);
-    print_full(command);
+    char command[128] = "AT+CIPSTART=";
+    strcat(strcat(strcat(strcat(strcat(strcat(command, "\""), protocol), "\",\""), host), "\","), port);
+    printf("%d\n", strlen(command));
+    puts(command);
     write_full_uart(command);
     if (read_full_uart_and_expect(strcat(command, "\r\r\n"), 1000) == false)
     {
-        print_full("nope");
+        puts("nope");
         return false;
     }
     if (read_full_uart_and_expect("CONNECT", 10000) == false)
@@ -53,17 +48,14 @@ bool send_cip_start_command(char *protocol, char *host, char *port)
         return false;
     if (read_full_uart_and_expect("OK\r\n", 1000) == false)
         return false;
-    free(command);
     return true;
 }
 
 bool send_cip_send_command(char *size, char *httpRequest)
 {
-    char *command = malloc(strlen("AT+CIPSEND=") + strlen(size) + 1);
-    command[0] = '\0';
-    strcat(command, "AT+CIPSEND=");
+    char command[128] = "AT+CIPSEND=";
     strcat(command, size);
-    print_full(command);
+    puts(command);
     write_full_uart(command);
     if (read_full_uart_and_expect(strcat(command, "\r\r\n"), 1000) == false)
         return false;
@@ -74,11 +66,10 @@ bool send_cip_send_command(char *size, char *httpRequest)
     if (read_full_uart_and_expect(">", 1000) == false)
         return false;
     write_full_uart(httpRequest);
-    free(command);
     return true;
 }
 
-void response_parser(Http *response)
+int8_t response_parser(Http *response)
 {
     uint8_t totalChunks = 0;
     size_t currentResponseSize = 1;
@@ -87,23 +78,22 @@ void response_parser(Http *response)
     {
         totalChunks++;
         if (totalChunks > 10)
-            break;
+            return -1;
         uint16_t currentChunkLength;
         char currentCharacter = read_uart(1000U);
         print(currentCharacter);
-        char *rawChunkLength = malloc(sizeof(char) * 2);
+        char rawChunkLength[5];
         uint8_t counter;
         for (counter = 0; currentCharacter != ':'; counter++)
         {
-            rawChunkLength = realloc(rawChunkLength, sizeof(char) * (counter + 2));
-            *(rawChunkLength + counter) = currentCharacter;
-            *(rawChunkLength + counter + 1) = '\0';
+            if (counter > 4)
+                return -1;
+            rawChunkLength[counter] = currentCharacter;
+            rawChunkLength[counter + 1] = '\0';
             currentCharacter = read_uart(1500U);
             print(currentCharacter);
         }
-        char *endOfRawChunkLengthString = rawChunkLength + counter + 1;
-        currentChunkLength = strtoul(rawChunkLength, &endOfRawChunkLengthString, 10);
-        free(rawChunkLength);
+        currentChunkLength = strtoul(rawChunkLength, NULL, 10);
         uint16_t bodyCounter;
         for (bodyCounter = 0; bodyCounter < currentChunkLength; bodyCounter++)
         {   
@@ -142,7 +132,6 @@ void response_parser(Http *response)
         strncat(fullRawResponse, rawResponseChunks[i].chunkData, rawResponseChunks[i].chunkLength);
         puts("concat'd");
     }
-    puts("freed 2");
     *(fullRawResponse + currentResponseSize) = '\0';
     puts("added null characters");
     parse_http(fullRawResponse, response);
@@ -153,6 +142,7 @@ void response_parser(Http *response)
     puts("got time");
     unix = parse_date(currentTimeString->value);
     puts(currentTimeString->value);
+    return 0;
 }
 
 int8_t make_http_request(char *protocol, char *host, char *port, char *size, char *httpRequest, Http *response)

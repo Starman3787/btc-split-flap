@@ -67,7 +67,7 @@ Json *parse_element(char **cursor);
 Json **parse_json(char *body, size_t *size);
 
 /* Other internals */
-char **split_header_values(char *headerValue, uint8_t *values, const char splitBy);
+int8_t split_header_values(char *contentTypeHeaderValues[], char *headerValue, uint8_t maxValues, const char splitBy);
 
 /* Front-facing API */
 void parse_http(char *rawHttp, Http *parsedHttp);
