@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include "util/http/http.h"
 
-void parse_http(char *rawHttp, Http *parsedHttp)
+void parse_http(Http *parsedHttp, char *rawHttp)
 {
     puts("parse_http init alloc");
     puts("parse_http init alloc'd");
@@ -12,11 +12,12 @@ void parse_http(char *rawHttp, Http *parsedHttp)
     uint8_t headersLength;
     char *headersEnd;
     puts("parsing headers");
-    parsedHttp->headers = http_header_parser(rawHttp, &headersLength, &headersEnd);
+    http_header_parser(parsedHttp->headers, rawHttp, &headersLength, &headersEnd);
     printf("found and parsed %d headers\n", headersLength);
+    printf("HEADER 0 == %s\n", parsedHttp->headers[0].key);
     parsedHttp->headersLength = headersLength;
     headersEnd++;
     puts("parsing body now");
-    parsedHttp->responseBody = http_body_parser(headersEnd, parsedHttp->headers, headersLength);
+    http_body_parser(parsedHttp, headersEnd, parsedHttp->headers, headersLength);
     puts("body parsed");
 }

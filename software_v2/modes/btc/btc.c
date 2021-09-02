@@ -14,7 +14,7 @@ void mode_btc(void)
 
     Http parsedHttp;
     // fetch price and convert it to a string
-    make_http_request(PROTOCOL, HOST, PORT, REQUEST_SIZE, REQUEST, &parsedHttp);
+    make_http_request(&parsedHttp, PROTOCOL, HOST, PORT, REQUEST_SIZE, REQUEST);
 
     if (parsedHttp.statusCode != 200)
     {
@@ -48,9 +48,9 @@ void mode_btc(void)
     else
     {
         int64_t rate;
-        for (uint8_t i = 0; i < parsedHttp.responseBody->data_size / sizeof(Json *); i++)
+        for (uint8_t i = 0; i < parsedHttp.responseBody.data_size / sizeof(Json *); i++)
         {
-            Json *element = *(parsedHttp.responseBody->data.data_json + i);
+            Json *element = *(parsedHttp.responseBody.data.data_json + i);
             if (element->type == JSON_NUMBER && strcmp(element->key, "rate") == 0)
                 rate = element->data.json_number;
         }

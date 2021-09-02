@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <ctype.h>
+#include "drivers/uart/uart.h"
 #include "util/http/http.h"
 
 void skip_whitespace(char **cursor)
@@ -59,18 +60,18 @@ char *get_string(char **cursor, size_t *size)
 
 bool get_boolean(char **cursor, size_t *size)
 {
-    char *value;
-    if ((value = malloc(sizeof(char) * 5)) == NULL)
-        return NULL;
-    *value = *((*cursor)++);
-    *(value + 1) = *((*cursor)++);
-    *(value + 2) = *((*cursor)++);
-    *(value + 3) = *((*cursor)++);
-    *(value + 4) = '\0';
+    char value[5];
+    value[0] = **cursor;
+    INCREMENT_POINTER(*cursor)
+    value[1] = **cursor;
+    INCREMENT_POINTER(*cursor)
+    value[2] = **cursor;
+    INCREMENT_POINTER(*cursor)
+    value[3] = **cursor;
+    INCREMENT_POINTER(*cursor)
+    value[4] = '\0';
     *size = sizeof(bool) * 1;
-    bool result = strcmp(value, "true") == 0 ? true : false;
-    free(value);
-    return result;
+    return strcmp(value, "true") == 0 ? true : false;
 }
 
 Json **get_array(char **cursor, size_t *size)
@@ -132,25 +133,15 @@ Json **get_object(char **cursor, size_t *size)
 
 int64_t get_number(char **cursor, size_t *size)
 {
-    char *value;
-    if ((value = malloc(sizeof(char) * 1)) == NULL)
-        return 0;
-    *value = '\0';
-    uint8_t i;
-    for (i = 1; **cursor == '.' || isdigit((unsigned char)**cursor); i++, (*cursor)++)
+    char value[64];
+    value[0] = '\0';
+    for (uint8_t i = 0; (**cursor == '.' || isdigit((unsigned char)**cursor)) && i < 62; i++, (*cursor)++)
     {
-        if ((value = realloc(value, sizeof(char) * (i + 1))) == NULL)
-        {
-            free(value);
-            return 0;
-        }
-        *(value + i - 1) = **cursor;
-        *(value + i) = '\0';
+        value[i] = **cursor;
+        value[i + 1] = '\0';
     }
-    char *endOfValuePointer = value + strlen(value);
-    int64_t number = strtoll(value, &endOfValuePointer, 10);
+    int64_t number = strtoll(value, NULL, 10);
     *size = sizeof(int64_t);
-    free(value);
     return number;
 }
 

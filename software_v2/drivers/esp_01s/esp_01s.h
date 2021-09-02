@@ -22,6 +22,7 @@ typedef struct chunkData {
 ChunkData rawResponseChunks[10];
 
 void init_esp_01s(void);
-int8_t make_http_request(char *protocol, char *host, char *port, char *size, char *httpRequest, Http *response);
+int8_t make_http_request(Http *response, char *protocol, char *host, char *port, char *size, char *httpRequest);
+int8_t response_parser(Http *response);
 
 #endif

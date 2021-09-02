@@ -1,108 +1,42 @@
 #include <stdint.h>
-#include <stdlib.h>
 #include <ctype.h>
 #include <stdio.h>
 #include "util/http/http.h"
+#include "drivers/uart/uart.h"
 
-/**
- * @brief Extracts the headers from a raw HTTP response, and returns a pointer to an array of pointers to Header structures.
- * 
- * @param *rawHttp A pointer to the zeroth index of the raw HTTP response.
- * @param *headerIndex A pointer which will contain the value of the number of headers extracted from this response.
- * @return struct Header** 
- */
-Header **http_header_parser(char *rawHttp, uint8_t *headerIndex, char **headersEnd)
+int8_t http_header_parser(Header *allHeaders, char *rawHttp, uint8_t *headerIndex, char **headersEnd)
 {
-    Header **allHeaders;
-    puts("17");
-    if ((allHeaders = malloc(sizeof(Header *) * 1)) == NULL)
-        return NULL;
-    puts("20");
     while (!(*rawHttp == '\r' && *(rawHttp + 1) == '\n'))
-        rawHttp++;
-    rawHttp += 2;
-    *headerIndex = 0;
-    puts("25");
-    while (1)
+        INCREMENT_POINTER(rawHttp)
+    INCREMENT_POINTER(rawHttp)
+    INCREMENT_POINTER(rawHttp)
+    for (*headerIndex = 0; *headerIndex < 16; (*headerIndex)++)
     {
-        puts("28");
         if (*rawHttp == '\r' && *(rawHttp + 1) == '\n')
             break;
-        puts("31");
-        if ((allHeaders = realloc(allHeaders, sizeof(Header *) * (*headerIndex + 1))) == NULL)
+        else if (*rawHttp == '\0')
+            return -1;
+        allHeaders[*headerIndex].key[0] = '\0';
+        INCREMENT_POINTER(rawHttp)
+        for (uint8_t keyLength = 0; *(rawHttp - 1) != ':' && keyLength < 62; keyLength++)
         {
-            free_headers(&allHeaders, *headerIndex);
-            return NULL;
+            allHeaders[*headerIndex].key[keyLength] = (char)tolower(*(rawHttp - 1));
+            allHeaders[*headerIndex].key[keyLength + 1] = '\0';
+            INCREMENT_POINTER(rawHttp)
         }
-        puts("37");
-        char *key;
-        if ((key = malloc(sizeof(char))) == NULL)
+        puts(allHeaders[*headerIndex].key);
+        allHeaders[*headerIndex].value[0] = '\0';
+        INCREMENT_POINTER(rawHttp)
+        INCREMENT_POINTER(rawHttp)
+        for (uint8_t valueLength = 0; !(*(rawHttp - 1) == '\r' && *rawHttp == '\n' && valueLength < 126); valueLength++)
         {
-            free_headers(&allHeaders, *headerIndex);
-            return NULL;
+            allHeaders[*headerIndex].value[valueLength] = *(rawHttp - 1);
+            allHeaders[*headerIndex].value[valueLength + 1] = '\0';
+            INCREMENT_POINTER(rawHttp)
         }
-        *key = '\0';
-        puts("45");
-        uint8_t keyLength;
-        rawHttp++;
-        puts("48");
-        for (keyLength = 1; *(rawHttp - 1) != ':'; keyLength++)
-        {
-            puts("51");
-            if ((key = realloc(key, sizeof(char) * (keyLength + 1))) == NULL)
-            {
-                free(key);
-                free_headers(&allHeaders, *headerIndex);
-                return NULL;
-            }
-            puts("58");
-            *(key + keyLength - 1) = (char)tolower(*(rawHttp - 1));
-            *(key + keyLength) = '\0';
-            rawHttp++;
-        }
-        char *value;
-        puts("64");
-        if ((value = malloc(sizeof(char))) == NULL)
-        {
-            free(key);
-            free_headers(&allHeaders, *headerIndex);
-            return NULL;
-        }
-        puts("71");
-        *value = '\0';
-        uint8_t valueLength;
-        rawHttp += 2;
-        puts("75");
-        for (valueLength = 1; !(*(rawHttp - 1) == '\r' && *rawHttp == '\n'); valueLength++)
-        {
-            puts("78");
-            if ((value = realloc(value, sizeof(char) * (valueLength + 1))) == NULL)
-            {
-                free(value);
-                free(key);
-                free_headers(&allHeaders, *headerIndex);
-                return NULL;
-            }
-            puts("86");
-            *(value + valueLength - 1) = *(rawHttp - 1);
-            *(value + valueLength) = '\0';
-            rawHttp++;
-        }
-        puts("91");
-        if ((*(allHeaders + *headerIndex) = malloc(sizeof(Header))) == NULL)
-        {
-            free(value);
-            free(key);
-            free_headers(&allHeaders, *headerIndex);
-            return NULL;
-        }
-        puts("99");
-        (*(allHeaders + *headerIndex))->key = key;
-        (*(allHeaders + *headerIndex))->value = value;
-        rawHttp++;
-        (*headerIndex)++;
+        INCREMENT_POINTER(rawHttp)
+        puts(allHeaders[*headerIndex].value);
     }
-    puts("105");
     *headersEnd = ++rawHttp;
-    return allHeaders;
+    return 0;
 }

@@ -5,6 +5,8 @@
 #include <ctype.h>
 #include <stdbool.h>
 
+#define INCREMENT_POINTER(pointer) if (*(++pointer) == '\0') return 1;
+
 extern char httpSupported[2][9];
 
 typedef enum contenttype {
@@ -45,15 +47,15 @@ typedef struct body {
 } Body;
 
 typedef struct header {
-    char *key;
-    char *value;
+    char key[64];
+    char value[128];
 } Header;
 
 typedef struct http {
     uint16_t statusCode;
-    Header **headers;
+    Header headers[16];
     uint8_t headersLength;
-    Body *responseBody;
+    Body responseBody;
 } Http;
 
 /* JSON parsing functions */
@@ -67,17 +69,16 @@ Json *parse_element(char **cursor);
 Json **parse_json(char *body, size_t *size);
 
 /* Other internals */
-int8_t split_header_values(char *contentTypeHeaderValues[], char *headerValue, uint8_t maxValues, const char splitBy);
+int8_t split_header_values(char *contentTypeHeaderValues[], char *headerValue, uint8_t maxValues, uint8_t maxValueLength, const char splitBy);
 
 /* Front-facing API */
-void parse_http(char *rawHttp, Http *parsedHttp);
-Header *find_header(Header **headers, uint8_t headersLength, char *key);
+void parse_http(Http *parsedHttp, char *rawHttp);
+Header *find_header(Header *headers, uint8_t headersLength, char *key);
 uint16_t http_response_status(char *rawHttp);
-Header **http_header_parser(char *rawHttp, uint8_t *headerIndex, char **headersEnd);
-Body *http_body_parser(char *rawBody, Header **headers, uint8_t headersLength);
+int8_t http_header_parser(Header *allHeaders, char *rawHttp, uint8_t *headerIndex, char **headersEnd);
+int8_t http_body_parser(Http *parsedHttp, char *rawBody, Header *headers, uint8_t headersLength);
 
-void free_body(Body **parsedBody);
-void free_headers(Header ***headers, uint8_t headersLength);
+void free_body(Body *parsedBody);
 void free_http(Http *parsedHttp);
 void free_json(Json ***jsonBody, size_t child_size);
 

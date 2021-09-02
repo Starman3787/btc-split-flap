@@ -134,7 +134,7 @@ int8_t response_parser(Http *response)
     }
     *(fullRawResponse + currentResponseSize) = '\0';
     puts("added null characters");
-    parse_http(fullRawResponse, response);
+    parse_http(response, fullRawResponse);
     puts("parsed http");
     free(fullRawResponse);
     puts("freed 3");
@@ -145,7 +145,7 @@ int8_t response_parser(Http *response)
     return 0;
 }
 
-int8_t make_http_request(char *protocol, char *host, char *port, char *size, char *httpRequest, Http *response)
+int8_t make_http_request(Http *response, char *protocol, char *host, char *port, char *size, char *httpRequest)
 {
     if (send_cip_start_command(protocol, host, port) != true)
     {

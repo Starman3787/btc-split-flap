@@ -16,14 +16,13 @@ char httpSupported[2][9] = {
  */
 uint16_t http_response_status(char *rawHttp)
 {
-    for (uint8_t index = 0; index < strlen(httpSupported[0]); index++, rawHttp++)
-        if ((*rawHttp != *(httpSupported[0] + index)) && (*rawHttp != *(httpSupported[1] + index)))
+    for (uint8_t i = 0; i < strlen(httpSupported[0]); i++, rawHttp++)
+        if ((*rawHttp != *(httpSupported[0] + i)) && (*rawHttp != *(httpSupported[1] + i)))
             return 0U;
     if (*rawHttp != ' ')
         return 0U;
     rawHttp++;
     char rawHttpStatus[4];
     strncpy(rawHttpStatus, rawHttp, 3);
-    char *rawHttpStatusEnd = rawHttpStatus + 3;
-    return strtoul(rawHttpStatus, &rawHttpStatusEnd, 10);
+    return strtoul(rawHttpStatus, NULL, 10);
 }

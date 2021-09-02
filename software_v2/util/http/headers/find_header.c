@@ -4,14 +4,19 @@
 #include <ctype.h>
 #include <stdint.h>
 #include <string.h>
+#include <stdio.h>
 #include "util/http/http.h"
 #include "../util/to_lower_case.h"
 
-Header *find_header(Header **headers, uint8_t headersLength, char *key)
+Header *find_header(Header *headers, uint8_t headersLength, char *key)
 {
-    for (; headersLength--; headers++)
-        if (strcmp((*headers)->key, key) == 0)
-            return *headers;
+    printf("FINDING %s\n", key);
+    for (uint8_t i = 0; headersLength--; i++)
+    {
+        puts(headers[i].key);
+        if (strcmp(headers[i].key, key) == 0)
+            return &(headers[i]);
+    }
     return NULL;
 }
 
