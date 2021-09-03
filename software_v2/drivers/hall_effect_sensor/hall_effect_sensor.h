@@ -12,6 +12,7 @@
 #define DRIVERS_HALL_EFFECT_SENSOR_H_
 
 #include <stdint.h>
+#include <stdbool.h>
 
 extern uint8_t hall_effect_sensor_pins[5];
 

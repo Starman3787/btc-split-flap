@@ -1,7 +1,6 @@
 #ifndef FIND_HEADER_C
 #define FIND_HEADER_C
 
-#include <ctype.h>
 #include <stdint.h>
 #include <string.h>
 #include <stdio.h>

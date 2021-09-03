@@ -12,53 +12,35 @@ void skip_whitespace(char **cursor)
         (*cursor)++;
 }
 
-char *get_property_name(char **cursor)
+int8_t get_property_name(char elementKey[], char **cursor)
 {
     skip_whitespace(cursor);
     if (**cursor == 't' || **cursor == 'f' || **cursor == 'n' || **cursor == '[' || **cursor == '{')
-        return NULL;
+        return -1;
     (*cursor)++;
-    char *propertyName;
-    if ((propertyName = malloc(sizeof(char) * 1)) == NULL)
-        return NULL;
-    *propertyName = '\0';
-    for (uint8_t i = 1; **cursor != '"'; i++, (*cursor)++)
+    elementKey[0] = '\0';
+    for (uint8_t i = 0; **cursor != '"' && i < 62; i++, (*cursor)++)
     {
-        if ((propertyName = realloc(propertyName, sizeof(char) * (i + 1))) == NULL)
-        {
-            free(propertyName);
-            return NULL;
-        }
-        *(propertyName + i - 1) = **cursor;
-        *(propertyName + i) = '\0';
+        elementKey[i] = **cursor;
+        elementKey[i + 1] = '\0';
     }
     (*cursor)++;
-    return propertyName;
+    return 0;
 }
 
-char *get_string(char **cursor, size_t *size)
+int8_t get_string(char elementString[], char **cursor)
 {
-    char *value;
-    if ((value = malloc(sizeof(char) * 1)) == NULL)
-        return NULL;
-    *value = '\0';
-    uint8_t i;
-    for (i = 1; **cursor != '"'; i++, (*cursor)++)
+    elementString[0] = '\0';
+    for (uint8_t i = 0; **cursor != '"' && i < 126; i++, (*cursor)++)
     {
-        if ((value = realloc(value, sizeof(char) * (i + 1))) == NULL)
-        {
-            free(value);
-            return NULL;
-        }
-        *(value + i - 1) = **cursor;
-        *(value + i) = '\0';
+        elementString[i] = **cursor;
+        elementString[i + 1] = '\0';
     }
-    *size = sizeof(char) * i;
     (*cursor)++;
-    return value;
+    return 0;
 }
 
-bool get_boolean(char **cursor, size_t *size)
+int8_t get_boolean(bool *elementBoolean, char **cursor)
 {
     char value[5];
     value[0] = **cursor;
@@ -70,68 +52,11 @@ bool get_boolean(char **cursor, size_t *size)
     value[3] = **cursor;
     INCREMENT_POINTER(*cursor)
     value[4] = '\0';
-    *size = sizeof(bool) * 1;
-    return strcmp(value, "true") == 0 ? true : false;
+    *elementBoolean = strcmp(value, "true") == 0 ? true : false;
+    return 0;
 }
 
-Json **get_array(char **cursor, size_t *size)
-{
-    Json **elements;
-    if ((elements = malloc(sizeof(Json *) * 0)) == NULL)
-        return NULL;
-    uint8_t i;
-    (*cursor)++;
-    for (i = 0; **cursor != ']'; (*cursor)++)
-    {
-        skip_whitespace(cursor);
-        if (**cursor == ']')
-            break;
-        if ((elements = realloc(elements, sizeof(Json *) * (i + 1))) == NULL)
-        {
-            free_json(&elements, sizeof(Json *) * i);
-            free(elements);
-            return NULL;
-        }
-        Json *element = parse_element(cursor);
-        *(elements + i) = element;
-        if (**cursor == ']')
-            break;
-        i++;
-    }
-    (*cursor)++;
-    *size = sizeof(Json *) * (i + 1);
-    return elements;
-}
-
-Json **get_object(char **cursor, size_t *size)
-{
-    Json **elements;
-    if ((elements = malloc(sizeof(Json *) * 0)) == NULL)
-        return NULL;
-    uint8_t i;
-    (*cursor)++;
-    for (i = 0; **cursor != '}'; i++, (*cursor)++)
-    {
-        skip_whitespace(cursor);
-        if (**cursor == '}')
-            break;
-        if ((elements = realloc(elements, sizeof(Json *) * (i + 1))) == NULL)
-        {
-            free_json(&elements, sizeof(Json *) * i);
-            free(elements);
-            return NULL;
-        }
-        Json *element = parse_element(cursor);
-        *(elements + i) = element;
-        if (**cursor == '}')
-            break;
-    }
-    (*cursor)++;
-    *size = sizeof(Json *) * (i + 1);
-    return elements;
-}
-
-int64_t get_number(char **cursor, size_t *size)
+int8_t get_number(int64_t *elementNumber, char **cursor)
 {
     char value[64];
     value[0] = '\0';
@@ -140,106 +65,79 @@ int64_t get_number(char **cursor, size_t *size)
         value[i] = **cursor;
         value[i + 1] = '\0';
     }
-    int64_t number = strtoll(value, NULL, 10);
-    *size = sizeof(int64_t);
-    return number;
+    *elementNumber = strtoll(value, NULL, 10);
+    return 0;
 }
 
-Json *parse_element(char **cursor)
+int8_t parse_element(Json *jsonElement, const char *jsonProperty, char **cursor)
 {
-    Json *element;
-    if ((element = malloc(sizeof(Json) * 1)) == NULL)
-        return NULL;
-    element->key = get_property_name(cursor);
-    if (element->key != NULL)
+    char elementKey[64];
+    get_property_name(elementKey, cursor);
+    bool wantedElement = false;
+    if (strcmp(elementKey, jsonProperty) == 0)
+    {
+        wantedElement = true;
+        strncpy(jsonElement->key, elementKey, 63);
+    }
+    if (elementKey[0] != '\0')
     {
         (*cursor)++;
         skip_whitespace(cursor);
     }
-    size_t size;
+    char elementString[128];
+    bool elementBoolean;
+    int64_t elementNumber;
     switch (**cursor)
     {
     case '"':
         // string
         (*cursor)++;
-        element->type = JSON_STRING;
-        if ((element->data.json_string = get_string(cursor, &size)) == NULL)
+        get_string(elementString, cursor);
+        if (wantedElement == true)
         {
-            free(element);
-            return NULL;
+            jsonElement->type = JSON_STRING;
+            strncpy(jsonElement->data.json_string, elementString, 127);
+            return 0;
         }
-        element->child_size = size;
         break;
     case 't':
     case 'f':
     case 'n':
         // boolean
-        element->type = JSON_BOOLEAN;
-        if ((element->data.json_boolean = get_boolean(cursor, &size)) == (bool)NULL)
+        get_boolean(&elementBoolean, cursor);
+        if (wantedElement == true)
         {
-            free(element);
-            return NULL;
+            jsonElement->type = JSON_BOOLEAN;
+            jsonElement->data.json_boolean = elementBoolean;
+            return 0;
         }
-        element->child_size = size;
-        break;
-    case '[':
-        // array
-        element->type = JSON_ARRAY;
-        if ((element->data.json_array = get_array(cursor, &size)) == NULL)
-        {
-            free(element);
-            return NULL;
-        }
-        element->child_size = size;
-        break;
-    case '{':
-        // object
-        element->type = JSON_OBJECT;
-        if ((element->data.json_object = get_object(cursor, &size)) == NULL)
-        {
-            free(element);
-            return NULL;
-        }
-        element->child_size = size;
         break;
     default:
         // number
-        element->type = JSON_NUMBER;
-        element->data.json_number = get_number(cursor, &size);
-        element->child_size = size;
+        get_number(&elementNumber, cursor);
+        if (wantedElement == true)
+        {
+            jsonElement->type = JSON_NUMBER;
+            jsonElement->data.json_number = elementNumber;
+            return 0;
+        }
         break;
     }
     skip_whitespace(cursor);
-    return element;
+    return 1;
 }
 
-Json **parse_json(char *body, size_t *size)
+int8_t parse_json(Json *jsonElement, const char *jsonProperty, char *body)
 {
     if (*body != '{')
-        return NULL;
-    Json **allJsonElements;
-    if ((allJsonElements = malloc(sizeof(Json *) * 1)) == NULL)
-        return NULL;
-    uint8_t count = 1;
+        return -1;
     while (*(++body) != '\0')
     {
         skip_whitespace(&body);
         if (*body == '\0')
             break;
-        if ((allJsonElements = realloc(allJsonElements, sizeof(Json *) * count)) == NULL)
-        {
-            free(allJsonElements);
-            return NULL;
-        }
-        Json *element;
-        if ((element = parse_element(&body)) == NULL)
-        {
-            free_json(&allJsonElements, sizeof(Json *) * (count - 1));
-            return NULL;
-        }
-        *(allJsonElements + count - 1) = element;
-        count++;
+        if (parse_element(jsonElement, jsonProperty, &body) == 0)
+            return 0;
     }
-    *size = sizeof(Json *) * (count - 1);
-    return allJsonElements;
+    return -1;
 }

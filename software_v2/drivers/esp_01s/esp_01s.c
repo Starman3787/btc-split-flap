@@ -140,7 +140,9 @@ int8_t response_parser(Http *response)
     puts("freed 3");
     Header *currentTimeString = find_header(response->headers, response->headersLength, "date");
     puts("got time");
-    unix = parse_date(currentTimeString->value);
+    time_t timestamp;
+    parse_date(&timestamp, currentTimeString->value);
+    unix = timestamp;
     puts(currentTimeString->value);
     return 0;
 }

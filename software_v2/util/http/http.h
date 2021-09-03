@@ -25,25 +25,21 @@ typedef enum jsontype {
 typedef struct json Json;
 
 struct json {
-    char *key;
+    char key[64];
     JsonType type;
     union {
         int64_t json_number;
-        char *json_string;
+        char json_string[128];
         bool json_boolean;
-        Json **json_array;
-        Json **json_object;
     } data;
-    size_t child_size;
 };
 
 typedef struct body {
     ContentType content_type;
     union {
-        Json **data_json;
-        char *data_text;
+        Json data_json;
+        char data_text[1024];
     } data;
-    size_t data_size;
 } Body;
 
 typedef struct header {
@@ -60,13 +56,14 @@ typedef struct http {
 
 /* JSON parsing functions */
 void skip_whitespace(char **cursor);
-char *get_property_name(char **cursor);
-char *get_string(char **cursor, size_t *size);
-bool get_boolean(char **cursor, size_t *size);
-Json **get_array(char **cursor, size_t *size);
-Json **get_object(char **cursor, size_t *size);
-Json *parse_element(char **cursor);
-Json **parse_json(char *body, size_t *size);
+int8_t get_property_name(char elementKey[], char **cursor);
+int8_t get_string(char elementString[], char **cursor);
+int8_t get_boolean(bool *elementBoolean, char **cursor);
+int8_t get_number(int64_t *elementNumber, char **cursor);
+// Json **get_array(char **cursor, size_t *size);
+// Json **get_object(char **cursor, size_t *size);
+int8_t parse_element(Json *jsonElement, const char *jsonProperty, char **cursor);
+int8_t parse_json(Json *jsonElement, const char *jsonProperty, char *body);
 
 /* Other internals */
 int8_t split_header_values(char *contentTypeHeaderValues[], char *headerValue, uint8_t maxValues, uint8_t maxValueLength, const char splitBy);
@@ -77,9 +74,5 @@ Header *find_header(Header *headers, uint8_t headersLength, char *key);
 uint16_t http_response_status(char *rawHttp);
 int8_t http_header_parser(Header *allHeaders, char *rawHttp, uint8_t *headerIndex, char **headersEnd);
 int8_t http_body_parser(Http *parsedHttp, char *rawBody, Header *headers, uint8_t headersLength);
-
-void free_body(Body *parsedBody);
-void free_http(Http *parsedHttp);
-void free_json(Json ***jsonBody, size_t child_size);
 
 #endif

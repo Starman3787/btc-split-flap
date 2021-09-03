@@ -8,6 +8,6 @@
 extern const char months[12][4];
 
 int8_t convertMonth(const char *month);
-time_t parse_date(char *date);
+int8_t parse_date(time_t *timeOutput, char *date);
 
 #endif

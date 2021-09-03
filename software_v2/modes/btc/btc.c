@@ -47,13 +47,7 @@ void mode_btc(void)
     }
     else
     {
-        int64_t rate;
-        for (uint8_t i = 0; i < parsedHttp.responseBody.data_size / sizeof(Json *); i++)
-        {
-            Json *element = *(parsedHttp.responseBody.data.data_json + i);
-            if (element->type == JSON_NUMBER && strcmp(element->key, "rate") == 0)
-                rate = element->data.json_number;
-        }
+        int64_t rate = parsedHttp.responseBody.data.data_json.data.json_number;
 
         printf("PRICE: %llu\n", rate);
 
@@ -76,7 +70,7 @@ void mode_btc(void)
 
         // display the message on the split flap display
         char priceString[6];
-        sprintf(priceString, "%llu", rate);
+        snprintf(priceString, 6, "%llu", rate);
         display_message(priceString);
 
         // give the motors a second to stabilise
@@ -90,6 +84,4 @@ void mode_btc(void)
         toggle_motor(4);
 
     }
-
-    free_http(&parsedHttp);
 }
