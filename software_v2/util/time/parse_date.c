@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <time.h>
 #include <stdlib.h>
+#include <string.h>
 #include "util/http/http.h"
 #include "./parse_date.h"
 
@@ -30,12 +31,8 @@ int8_t convertMonth(const char *month)
     return 0;
 }
 
-/**
- * @brief Parses a HTTP "Date" header, specified here: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Date
- * 
- * @param date 
- * @return time_t The UNIX timestamp (seconds)
- */
+// parses a HTTP "Date" header, specified here: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Date
+// to UNIX (seconds)
 int8_t parse_date(time_t *timeOutput, char *date)
 {
     struct tm t;

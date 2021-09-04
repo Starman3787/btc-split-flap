@@ -1,13 +1,3 @@
-/**
- * @file status.h
- * @author Starman
- * @brief Pins of the status LEDs
- * @version 0.1
- * @date 2021-07-14
- * 
- * @copyright Copyright (c) 2021
- * 
- */
 #ifndef UTIL_STATUS_H_
 #define UTIL_STATUS_H_
 

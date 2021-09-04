@@ -1,9 +1,9 @@
 #include <stdint.h>
 #include "util/delay/delay.h"
-#include "drivers/motor/motor.h"
+#include "drivers/stepper_motor/stepper_motor.h"
 #include "drivers/split_flap/split_flap.h"
 
-void mode_test(void)
+int8_t mode_test(void)
 {
 
     // enable all motors
@@ -66,4 +66,6 @@ void mode_test(void)
     toggle_motor(2);
     toggle_motor(3);
     toggle_motor(4);
+
+    return 0;
 }

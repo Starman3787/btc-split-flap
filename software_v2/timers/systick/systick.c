@@ -1,21 +1,7 @@
-/**
- * @file systick.c
- * @author Starman
- * @brief SysTick functions
- * @version 0.1
- * @date 2021-05-27
- * 
- * @copyright Copyright (c) 2021
- * 
- */
-#include "../../headers/stm32f767xx.h"
-#include "../../headers/CMSIS/core_cm7.h"
+#include "headers/stm32f767xx.h"
+#include "headers/CMSIS/core_cm7.h"
 #include "timers/systick/systick.h"
 
-/**
- * @brief Initialises and starts the SysTick
- * 
- */
 void init_systick(void)
 {
     SysTick->CTRL |= (0b1 << 1); /* enables the SysTick interrupt */

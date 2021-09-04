@@ -1,20 +1,21 @@
 #include <stdio.h>
 #include <string.h>
 #include "util/http/http.h"
-#include "drivers/wifi/wifi.h"
+#include "main.h"
 #include "drivers/split_flap/split_flap.h"
 #include "drivers/esp_01s/esp_01s.h"
-#include "drivers/motor/motor.h"
+#include "drivers/stepper_motor/stepper_motor.h"
 #include "timers/systick/systick.h"
 #include "util/delay/delay.h"
 
-void mode_btc(void)
+int8_t mode_btc(void)
 {
     puts("Fetching price...");
 
     Http parsedHttp;
     // fetch price and convert it to a string
-    make_http_request(&parsedHttp, PROTOCOL, HOST, PORT, REQUEST_SIZE, REQUEST);
+    if (make_http_request(&parsedHttp, "rate", PROTOCOL, HOST, PORT, REQUEST_SIZE, REQUEST) != 0)
+        return -1;
 
     if (parsedHttp.statusCode != 200)
     {
@@ -84,4 +85,6 @@ void mode_btc(void)
         toggle_motor(4);
 
     }
+
+    return 0;
 }

@@ -1,22 +1,17 @@
-#ifndef FIND_HEADER_C
-#define FIND_HEADER_C
-
 #include <stdint.h>
 #include <string.h>
-#include <stdio.h>
 #include "util/http/http.h"
 #include "../util/to_lower_case.h"
 
-Header *find_header(Header *headers, uint8_t headersLength, char *key)
+int8_t find_header(Header *headerFound, Header *headers, uint8_t headersLength, char *key)
 {
-    printf("FINDING %s\n", key);
-    for (uint8_t i = 0; headersLength--; i++)
+    while (headersLength--)
     {
-        puts(headers[i].key);
-        if (strcmp(headers[i].key, key) == 0)
-            return &(headers[i]);
+        if (strcmp(headers[headersLength].key, key) == 0)
+        {
+            *headerFound = headers[headersLength];
+            return 0;
+        }
     }
-    return NULL;
+    return -1;
 }
-
-#endif

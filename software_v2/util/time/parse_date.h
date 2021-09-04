@@ -2,8 +2,7 @@
 #define UTIL_PARSE_DATE_H_
 
 #include <stdint.h>
-#include <string.h>
-#include <stdio.h>
+#include <time.h>
 
 extern const char months[12][4];
 

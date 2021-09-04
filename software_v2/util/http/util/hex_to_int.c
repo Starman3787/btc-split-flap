@@ -12,12 +12,6 @@ uint8_t hex_char_to_int(char hex)
     return 0;
 }
 
-/**
- * @brief Converts hexidecimal to its denary equivalent.
- * 
- * @param hex 
- * @return uint32_t 
- */
 uint32_t hex_to_int(char *hex)
 {
     uint32_t total = 0;

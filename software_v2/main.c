@@ -2,9 +2,9 @@
 #include <stdio.h>
 #include <time.h>
 #include "timers/systick/systick.h"
-#include "./main.h"
+#include "main.h"
 #include "drivers/hall_effect_sensor/hall_effect_sensor.h"
-#include "drivers/motor/motor.h"
+#include "drivers/stepper_motor/stepper_motor.h"
 #include "drivers/led/led.h"
 #include "drivers/split_flap/split_flap.h"
 #include "drivers/uart/uart.h"

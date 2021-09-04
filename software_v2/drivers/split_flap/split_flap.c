@@ -1,55 +1,30 @@
-/**
- * @file split_flap.c
- * @author Starman
- * @brief Standard functions for interacting with the split-flap display
- * @version 0.1
- * @date 2021-07-11
- * 
- * @copyright Copyright (c) 2021
- * 
- */
 #include <stdint.h>
 #include <stdbool.h>
 #include <ctype.h>
 #include <string.h>
 #include "drivers/split_flap/split_flap.h"
 #include "drivers/hall_effect_sensor/hall_effect_sensor.h"
-#include "drivers/motor/motor.h"
+#include "drivers/stepper_motor/stepper_motor.h"
 #include "util/delay/delay.h"
-#include "../../main.h"
+#include "main.h"
 
-/**
- * @brief Checks all positions of the motors to see if they match the specified position
- * 
- * @param display_positions A pointer to an array of all the current motor positions
- * @param position The position to check for
- * @return true All modules match the specified position
- * @return false Not all modules match the specified position
- */
+// checks if all modules are at the specified position
 bool check_all_at_position(uint8_t position)
 {
     for (uint8_t i = 0; i < MODULE_COUNT; i++)
-        if (*(module_positions + i) != position)
+        if (module_positions[i] != position)
             return false;
     return true;
 }
 
-/**
- * @brief Defines the position of all modules.
- * 
- * @param display_positions A pointer to an array of positions for each flap.
- * @param position The position to define all modules to.
- */
+// defines the position of each module
 void set_all_positions(uint8_t position)
 {
     for (uint8_t i = 0; i < MODULE_COUNT; i++)
-        *(module_positions + i) = position;
+        module_positions[i] = position;
 }
 
-/**
- * @brief Initialises each display by defining position 0 to a known position 
- */
-void init_split_flap(void)
+int8_t init_split_flap(void)
 {
     set_all_positions(1);
     uint8_t notAtHome;
@@ -72,24 +47,20 @@ void init_split_flap(void)
     {
         for (uint8_t i = 0; i < MODULE_COUNT; i++)
         {
-            if (*(module_positions + i) != 0)
+            if (module_positions[i] != 0)
             {
                 write_motor(i);
                 write_motor(i);
                 if (read_hall_effect_sensor(i))
-                    *(module_positions + i) = 0;
+                    module_positions[i] = 0;
             }
         }
         delay_ms(10);
     }
+
+    return 0;
 }
 
-/**
- * @brief Converts a character to a position on the display
- * 
- * @param character 
- * @return uint8_t The motor position of the character on the display
- */
 uint8_t convert_char_to_position(char *character)
 {
     *character = toupper(*character);
@@ -178,43 +149,27 @@ uint8_t convert_char_to_position(char *character)
     }
 }
 
-/**
- * @brief Converts a string of characters to an array of motor positions
- * 
- * @param message 
- * @param positions 
- */
-void convert_string_to_positions(char *message, uint8_t *positions)
+// converts a string to an array of motor positions
+void convert_string_to_positions(char *message, uint8_t positions[])
 {
     for (uint8_t i = 0; i < MODULE_COUNT; i++)
     {
         if (strlen(message) <= i)
-            *(positions + i) = 0;
+            positions[i] = 0;
         else
-            *(positions + i) = convert_char_to_position(&message[i]);
+            positions[i] = convert_char_to_position(&message[i]);
     }
 }
 
-/**
- * @brief Checks that all motor positions match the required positions
- * 
- * @param requiredPositions 
- * @return true All positions have been reached
- * @return false Not all positions have been reached
- */
-bool check_positions_have_been_reached(uint8_t *requiredPositions)
+// check each module is at it's own specified position
+bool check_positions_have_been_reached(uint8_t requiredPositions[])
 {
     for (uint8_t i = 0; i < MODULE_COUNT; i++)
-        if (*(requiredPositions + i) != *(module_positions + i))
+        if (requiredPositions[i] != module_positions[i])
             return false;
     return true;
 }
 
-/**
- * @brief Displays a message on the split-flap display
- * 
- * @param message 
- */
 void display_message(char *message)
 {
     uint8_t requiredPositions[MODULE_COUNT];
@@ -226,14 +181,14 @@ void display_message(char *message)
     {
         for (uint8_t i = 0; i < MODULE_COUNT; i++)
         {
-            if (requiredPositions[i] != *(module_positions + i))
+            if (requiredPositions[i] != module_positions[i])
             {
                 write_motor(i);
                 write_motor(i);
                 increment[i]++;
                 if (increment[i] == (STEPS / FLAPS))
                 {
-                    *(module_positions + i) == 39 ? *(module_positions + i) = 0 : (*(module_positions + i))++;
+                    module_positions[i] == 39 ? module_positions[i] = 0 : module_positions[i]++;
                     increment[i] = 0;
                 }
             }

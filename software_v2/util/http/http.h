@@ -5,7 +5,7 @@
 #include <ctype.h>
 #include <stdbool.h>
 
-#define INCREMENT_POINTER(pointer) if (*(++pointer) == '\0') return 1;
+#define INCREMENT_POINTER(pointer) if (*(++pointer) == '\0') return -1;
 
 extern char httpSupported[2][9];
 
@@ -17,9 +17,7 @@ typedef enum contenttype {
 typedef enum jsontype {
     JSON_NUMBER,
     JSON_STRING,
-    JSON_BOOLEAN,
-    JSON_ARRAY,
-    JSON_OBJECT
+    JSON_BOOLEAN
 } JsonType;
 
 typedef struct json Json;
@@ -55,13 +53,11 @@ typedef struct http {
 } Http;
 
 /* JSON parsing functions */
-void skip_whitespace(char **cursor);
+int8_t skip_whitespace(char **cursor);
 int8_t get_property_name(char elementKey[], char **cursor);
 int8_t get_string(char elementString[], char **cursor);
 int8_t get_boolean(bool *elementBoolean, char **cursor);
 int8_t get_number(int64_t *elementNumber, char **cursor);
-// Json **get_array(char **cursor, size_t *size);
-// Json **get_object(char **cursor, size_t *size);
 int8_t parse_element(Json *jsonElement, const char *jsonProperty, char **cursor);
 int8_t parse_json(Json *jsonElement, const char *jsonProperty, char *body);
 
@@ -69,10 +65,10 @@ int8_t parse_json(Json *jsonElement, const char *jsonProperty, char *body);
 int8_t split_header_values(char *contentTypeHeaderValues[], char *headerValue, uint8_t maxValues, uint8_t maxValueLength, const char splitBy);
 
 /* Front-facing API */
-void parse_http(Http *parsedHttp, char *rawHttp);
-Header *find_header(Header *headers, uint8_t headersLength, char *key);
-uint16_t http_response_status(char *rawHttp);
+int8_t parse_http(Http *parsedHttp, char *jsonProperty, char *rawHttp);
+int8_t find_header(Header *headerFound, Header *headers, uint8_t headersLength, char *key);
+int8_t http_response_status(uint16_t *responseStatus, char *rawHttp);
 int8_t http_header_parser(Header *allHeaders, char *rawHttp, uint8_t *headerIndex, char **headersEnd);
-int8_t http_body_parser(Http *parsedHttp, char *rawBody, Header *headers, uint8_t headersLength);
+int8_t http_body_parser(Http *parsedHttp, char *jsonProperty, char *rawBody, Header *headers, uint8_t headersLength);
 
 #endif

@@ -1,23 +1,18 @@
 #include <stdlib.h>
 #include <stdint.h>
-#include <stdio.h>
 #include "util/http/http.h"
 
-void parse_http(Http *parsedHttp, char *rawHttp)
+int8_t parse_http(Http *parsedHttp, char *jsonProperty, char *rawHttp)
 {
-    puts("parse_http init alloc");
-    puts("parse_http init alloc'd");
-    parsedHttp->statusCode = http_response_status(rawHttp);
-    printf("found http status of %d\n", parsedHttp->statusCode);
+    if (http_response_status(&(parsedHttp->statusCode), rawHttp) != 0)
+        return -1;
     uint8_t headersLength;
     char *headersEnd;
-    puts("parsing headers");
-    http_header_parser(parsedHttp->headers, rawHttp, &headersLength, &headersEnd);
-    printf("found and parsed %d headers\n", headersLength);
-    printf("HEADER 0 == %s\n", parsedHttp->headers[0].key);
+    if (http_header_parser(parsedHttp->headers, rawHttp, &headersLength, &headersEnd) != 0)
+        return -1;
     parsedHttp->headersLength = headersLength;
     headersEnd++;
-    puts("parsing body now");
-    http_body_parser(parsedHttp, headersEnd, parsedHttp->headers, headersLength);
-    puts("body parsed");
+    if (http_body_parser(parsedHttp, jsonProperty, headersEnd, parsedHttp->headers, headersLength) != 0)
+        return -1;
+    return 0;
 }

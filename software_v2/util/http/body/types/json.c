@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
@@ -6,37 +5,43 @@
 #include "drivers/uart/uart.h"
 #include "util/http/http.h"
 
-void skip_whitespace(char **cursor)
+int8_t skip_whitespace(char **cursor)
 {
     while (**cursor == '\t' || **cursor == '\r' || **cursor == '\n' || **cursor == ' ')
-        (*cursor)++;
+    {
+        INCREMENT_POINTER((*cursor))
+    }
+    return 0;
 }
 
 int8_t get_property_name(char elementKey[], char **cursor)
 {
-    skip_whitespace(cursor);
+    if (skip_whitespace(cursor) != 0)
+        return -1;
     if (**cursor == 't' || **cursor == 'f' || **cursor == 'n' || **cursor == '[' || **cursor == '{')
         return -1;
-    (*cursor)++;
+    INCREMENT_POINTER((*cursor))
     elementKey[0] = '\0';
-    for (uint8_t i = 0; **cursor != '"' && i < 62; i++, (*cursor)++)
+    for (uint8_t i = 0; **cursor != '"' && i < 62; i++)
     {
         elementKey[i] = **cursor;
         elementKey[i + 1] = '\0';
+        INCREMENT_POINTER((*cursor))
     }
-    (*cursor)++;
+    INCREMENT_POINTER((*cursor))
     return 0;
 }
 
 int8_t get_string(char elementString[], char **cursor)
 {
     elementString[0] = '\0';
-    for (uint8_t i = 0; **cursor != '"' && i < 126; i++, (*cursor)++)
+    for (uint8_t i = 0; **cursor != '"' && i < 126; i++)
     {
         elementString[i] = **cursor;
         elementString[i + 1] = '\0';
+        INCREMENT_POINTER((*cursor))
     }
-    (*cursor)++;
+    INCREMENT_POINTER((*cursor))
     return 0;
 }
 
@@ -60,10 +65,11 @@ int8_t get_number(int64_t *elementNumber, char **cursor)
 {
     char value[64];
     value[0] = '\0';
-    for (uint8_t i = 0; (**cursor == '.' || isdigit((unsigned char)**cursor)) && i < 62; i++, (*cursor)++)
+    for (uint8_t i = 0; (**cursor == '.' || isdigit((unsigned char)**cursor)) && i < 62; i++)
     {
         value[i] = **cursor;
         value[i + 1] = '\0';
+        INCREMENT_POINTER((*cursor))
     }
     *elementNumber = strtoll(value, NULL, 10);
     return 0;
@@ -72,7 +78,8 @@ int8_t get_number(int64_t *elementNumber, char **cursor)
 int8_t parse_element(Json *jsonElement, const char *jsonProperty, char **cursor)
 {
     char elementKey[64];
-    get_property_name(elementKey, cursor);
+    if (get_property_name(elementKey, cursor) != 0)
+        return -1;
     bool wantedElement = false;
     if (strcmp(elementKey, jsonProperty) == 0)
     {
@@ -81,8 +88,9 @@ int8_t parse_element(Json *jsonElement, const char *jsonProperty, char **cursor)
     }
     if (elementKey[0] != '\0')
     {
-        (*cursor)++;
-        skip_whitespace(cursor);
+        INCREMENT_POINTER((*cursor))
+        if (skip_whitespace(cursor) != 0)
+            return -1;
     }
     char elementString[128];
     bool elementBoolean;
@@ -91,8 +99,9 @@ int8_t parse_element(Json *jsonElement, const char *jsonProperty, char **cursor)
     {
     case '"':
         // string
-        (*cursor)++;
-        get_string(elementString, cursor);
+        INCREMENT_POINTER((*cursor))
+        if (get_string(elementString, cursor) != 0)
+            return -1;
         if (wantedElement == true)
         {
             jsonElement->type = JSON_STRING;
@@ -104,7 +113,8 @@ int8_t parse_element(Json *jsonElement, const char *jsonProperty, char **cursor)
     case 'f':
     case 'n':
         // boolean
-        get_boolean(&elementBoolean, cursor);
+        if (get_boolean(&elementBoolean, cursor) != 0)
+            return -1;
         if (wantedElement == true)
         {
             jsonElement->type = JSON_BOOLEAN;
@@ -114,7 +124,8 @@ int8_t parse_element(Json *jsonElement, const char *jsonProperty, char **cursor)
         break;
     default:
         // number
-        get_number(&elementNumber, cursor);
+        if (get_number(&elementNumber, cursor) != 0)
+            return -1;
         if (wantedElement == true)
         {
             jsonElement->type = JSON_NUMBER;
@@ -123,7 +134,8 @@ int8_t parse_element(Json *jsonElement, const char *jsonProperty, char **cursor)
         }
         break;
     }
-    skip_whitespace(cursor);
+    if (skip_whitespace(cursor) != 0)
+        return -1;
     return 1;
 }
 
@@ -131,13 +143,16 @@ int8_t parse_json(Json *jsonElement, const char *jsonProperty, char *body)
 {
     if (*body != '{')
         return -1;
-    while (*(++body) != '\0')
+    INCREMENT_POINTER(body)
+    while (*body != '\0')
     {
-        skip_whitespace(&body);
+        if (skip_whitespace(&body) != 0)
+            return -1;
         if (*body == '\0')
             break;
         if (parse_element(jsonElement, jsonProperty, &body) == 0)
             return 0;
+        INCREMENT_POINTER(body)
     }
     return -1;
 }

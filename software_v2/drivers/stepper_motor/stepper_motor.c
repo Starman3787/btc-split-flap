@@ -1,16 +1,6 @@
-/**
- * @file motor.c
- * @author Starman
- * @brief Standard motor functions for interacting with stepper motors in combination with an A4988 driver
- * @version 0.2
- * @date 2021-05-29
- * 
- * @copyright Copyright (c) 2021
- * 
- */
 #include <stdint.h>
-#include "../../headers/stm32f767xx.h"
-#include "drivers/motor/motor.h"
+#include "headers/stm32f767xx.h"
+#include "drivers/stepper_motor/stepper_motor.h"
 
 /**
  * Pin  - Motor
@@ -46,11 +36,7 @@ uint8_t motor_enable_pins[5] = {
     3,
     4};
 
-/**
- * @brief Initialises the motor by setting the mode for both the enable and step pins
- * 
- */
-void init_motor(void)
+int8_t init_motor(void)
 {
     // enable the GPIO clocks
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOFEN |
@@ -69,23 +55,17 @@ void init_motor(void)
                     (0b01 << (motor_pins[2] * 2)) |
                     (0b01 << (motor_pins[3] * 2)) |
                     (0b01 << (motor_pins[4] * 2));
+
+    return 0;
 }
 
-/**
- * @brief Toggles the step pin on or off
- * 
- * @param motor 
- */
+// toggles the step pin, steps the stepper motor
 void write_motor(uint16_t motor)
 {
     GPIOF->ODR ^= (0b1 << motor_pins[motor]);
 }
 
-/**
- * @brief Toggles the enable pin on or off
- * 
- * @param motor 
- */
+// toggle enables/disables the motor
 void toggle_motor(uint16_t motor)
 {
     // logic high will disable the driver

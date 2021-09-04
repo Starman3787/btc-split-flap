@@ -1,22 +1,8 @@
-/**
- * @file delay.c
- * @author Starman
- * @brief Handles delay functions
- * @version 0.1
- * @date 2021-05-27
- * 
- * @copyright Copyright (c) 2021
- * 
- */
 #include <stdint.h>
 #include "timers/systick/systick.h"
 #include "util/delay/delay.h"
 
-/**
- * @brief Creates a blocking delay for a specified period of milliseconds
- * 
- * @param milliseconds 
- */
+// blocking delay
 void delay_ms(uint32_t milliseconds)
 {
     // wraparound is not a problem here

@@ -1,6 +1,5 @@
 #include <stdint.h>
 #include <ctype.h>
-#include <stdio.h>
 #include "util/http/http.h"
 #include "drivers/uart/uart.h"
 
@@ -24,7 +23,6 @@ int8_t http_header_parser(Header *allHeaders, char *rawHttp, uint8_t *headerInde
             allHeaders[*headerIndex].key[keyLength + 1] = '\0';
             INCREMENT_POINTER(rawHttp)
         }
-        puts(allHeaders[*headerIndex].key);
         allHeaders[*headerIndex].value[0] = '\0';
         INCREMENT_POINTER(rawHttp)
         INCREMENT_POINTER(rawHttp)
@@ -35,7 +33,6 @@ int8_t http_header_parser(Header *allHeaders, char *rawHttp, uint8_t *headerInde
             INCREMENT_POINTER(rawHttp)
         }
         INCREMENT_POINTER(rawHttp)
-        puts(allHeaders[*headerIndex].value);
     }
     *headersEnd = ++rawHttp;
     return 0;

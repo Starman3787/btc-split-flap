@@ -1,22 +1,8 @@
-/**
- * @file uart.c
- * @author Starman
- * @brief UART functions for setup and interacting with them
- * @version 0.1
- * @date 2021-06-02
- * 
- * @copyright Copyright (c) 2021
- * 
- */
 #include <stdint.h>
 #include <string.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include "../../headers/stm32f767xx.h"
-#include "../../headers/system_stm32f7xx.h"
+#include "headers/stm32f767xx.h"
 #include "drivers/uart/uart.h"
 #include "timers/systick/systick.h"
-#include "util/status/status.h"
 
 /**
  * Pin  - Motor
@@ -37,7 +23,7 @@ uint8_t uart_pins[4] = {
  * @brief Initialises the UART pins
  * 
  */
-void init_uart(void)
+int8_t init_uart(void)
 {
     // enable the UART4 clock as well as the GPIO clock
     RCC->APB1ENR |= RCC_APB1ENR_UART4EN |
@@ -69,8 +55,12 @@ void init_uart(void)
     UART5->CR1 |= USART_CR1_RE |
                   USART_CR1_TE |
                   USART_CR1_UE;
+
+    return 0;
 }
 
+// writes a single character to the UART
+// this UART is typically used for IO
 void print(char byte)
 {
     // interrupt and status register
@@ -85,11 +75,7 @@ void print(char byte)
     UART5->TDR = byte;
 }
 
-/**
- * @brief Prints a full string to the UART
- * 
- * @param message The string to output to the UART
- */
+// writes a string to the UART followed by CRLF
 void print_full(char *message)
 {
     // iterate over the message and output each character one by one
@@ -100,11 +86,7 @@ void print_full(char *message)
     print('\n');
 }
 
-/**
- * @brief Writes a single character
- * 
- * @param byte 
- */
+// writes a single character to the UART
 void write_uart(char byte)
 {
     // interrupt and status register
@@ -114,17 +96,12 @@ void write_uart(char byte)
         // set current value
         // to prevent compiler from optimising this bit out
         isr = !(UART4->ISR & USART_ISR_TXE);
-        status_loading_flash();
     } while (isr);
     // transmit the byte
     UART4->TDR = byte;
 }
 
-/**
- * @brief Reads a single character
- * 
- * @return char 
- */
+// reads a single character from the UART
 char read_uart(uint16_t timeout)
 {
     uint64_t readUntil = ticks + (uint64_t)timeout;
@@ -135,7 +112,6 @@ char read_uart(uint16_t timeout)
         // set current value
         // prevents compiler from optimising this loop out
         isr = !(UART4->ISR & USART_ISR_RXNE);
-        status_loading_flash();
         if (ticks > readUntil)
             return '\0';
     } while (isr);
@@ -143,11 +119,7 @@ char read_uart(uint16_t timeout)
     return UART4->RDR;
 }
 
-/**
- * @brief Writes a full string to the UART
- * 
- * @param message The message to write to the UART
- */
+// writes a string to the UART followed by CRLF
 void write_full_uart(char *message)
 {
     // iterate over the message and output each character one by one
@@ -158,39 +130,35 @@ void write_full_uart(char *message)
     write_uart('\n');
 }
 
-/**
- * @brief Reads from the UART, and expects a certain message
- * 
- * @param message The message to expect from the UART
- * @return true The message from the UART matches the message provided
- * @return false The message from the UART does not match the message provided
- */
-bool read_full_uart_and_expect(char *message, uint16_t timeout)
+// reads the UART and expects a specified message
+int8_t read_full_uart_and_expect(char *message, uint16_t timeout)
 {
     // iterate over every character of the expected message
     while (*message != '\0')
     {
         // read the uart and check that the character matches
         char currentValue = read_uart(timeout);
-        // print(currentValue == '\r' || currentValue == '\n' ? currentValue == '\r' ? 'r' : 'n' : currentValue);
         if (currentValue == '\0')
-            return false;
+            return -1;
         if (*(message++) != currentValue)
-            return false;
+            return -1;
     }
-    return true;
+    return 0;
 }
 
-void find_pattern(char *pattern, uint16_t patternLength)
+// reads the UART until a match is found with the specified pattern of characters
+int8_t find_pattern(char *pattern, uint16_t patternLength, uint16_t timeout)
 {
     uint8_t matchingChars = 0;
     while (matchingChars != patternLength)
     {
-        char currentValue = read_uart(20000U);
-        print(currentValue);
+        char currentValue = read_uart(timeout);
         if (currentValue == *(pattern + matchingChars))
             matchingChars++;
+        // else if (currentValue == '\0')
+        //     return -1;
         else
             matchingChars = 0U;
     }
+    return 0;
 }

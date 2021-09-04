@@ -1,21 +1,22 @@
-#include <stdio.h>
 #include <string.h>
 #include <stdint.h>
 #include "util/http/http.h"
 
-int8_t http_body_parser(Http *parsedHttp, char *rawBody, Header *headers, uint8_t headersLength)
+int8_t http_body_parser(Http *parsedHttp, char *jsonProperty, char *rawBody, Header *headers, uint8_t headersLength)
 {
-    Header *contentTypeHeader = find_header(headers, headersLength, "content-type");
+    Header contentTypeHeader;
+    if (find_header(&contentTypeHeader, headers, headersLength, "content-type") != 0)
+        return -1;
     char *contentTypeHeaderValues[1];
     char contentTypeHeaderValueOne[32];
     contentTypeHeaderValues[0] = contentTypeHeaderValueOne;
-    split_header_values(contentTypeHeaderValues, contentTypeHeader->value, 1, 32, ';');
-    printf("HEADER VALUES SPLIT: %s\n", contentTypeHeaderValues[0]);
+    if (split_header_values(contentTypeHeaderValues, contentTypeHeader.value, 1, 32, ';') != 0)
+        return -1;
     if (strcmp(contentTypeHeaderValues[0], "application/json") == 0)
     {
-        puts("JSON");
         parsedHttp->responseBody.content_type = HEADER_CONTENT_TYPE_APPLICATION_JSON;
-        parse_json(&(parsedHttp->responseBody.data.data_json), "rate", rawBody);
+        if (parse_json(&(parsedHttp->responseBody.data.data_json), jsonProperty, rawBody) != 0)
+            return -1;
     }
     else if (strcmp(contentTypeHeaderValues[0], "text/plain") == 0)
     {
