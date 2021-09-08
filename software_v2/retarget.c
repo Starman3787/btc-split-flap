@@ -41,5 +41,8 @@ int _write(int file, char *data, int len)
         data++;
     }
 
+    print('\r');
+    print('\n');
+
     return bytes_written;
 }
