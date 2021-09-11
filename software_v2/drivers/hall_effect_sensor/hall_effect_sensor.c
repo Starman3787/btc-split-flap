@@ -38,5 +38,5 @@ int8_t init_hall_effect_sensor(void)
 // returns true if a magnet is detected, or false if not
 bool read_hall_effect_sensor(uint16_t sensor)
 {
-    return (GPIOE->IDR & (0b1 << hall_effect_sensor_pins[sensor])) == 0;
+    return (GPIOE->IDR & (0b1 << hall_effect_sensor_pins[sensor])) == 0U;
 }
