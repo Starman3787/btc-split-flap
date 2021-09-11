@@ -23,12 +23,18 @@ void main(void)
     init_systick();
     delay_ms(1000);
     init_uart();
+#ifdef SYSTEM_DEBUG__
     puts("UART started...");
+#endif
     init_led();
+#ifdef SYSTEM_DEBUG__
     puts("Initialising WiFi...");
+#endif
     init_esp_01s();
 
+#ifdef SYSTEM_DEBUG__
     puts("Starting...");
+#endif
 
     // initialise all motors to their home position
     init_split_flap();
@@ -49,11 +55,10 @@ void main(void)
 
     while (1)
     {
-        
+
         // mode_test();
         // 900
         if ((unix + 120) % 900 == 0)
             mode_btc();
-
     }
 }
