@@ -38,10 +38,10 @@ int8_t init_uart(void)
                      (0b0111 << ((uart_pins[3] - 8) * 4));
 
     // set the mode to alternate function
-    GPIOC->MODER |= (0b10 << (uart_pins[0] * 2)) |
-                    (0b10 << (uart_pins[1] * 2));
-    GPIOB->MODER |= (0b10 << (uart_pins[2] * 2)) |
-                    (0b10 << (uart_pins[3] * 2));
+    GPIOC->MODER |= (0b10 << (uart_pins[0] * 2U)) |
+                    (0b10 << (uart_pins[1] * 2U));
+    GPIOB->MODER |= (0b10 << (uart_pins[2] * 2U)) |
+                    (0b10 << (uart_pins[3] * 2U));
 
     // calculate and set the baud rate
     uint16_t uartdiv = CORE_CLOCK / BAUD_RATE;
@@ -138,8 +138,6 @@ int8_t read_full_uart_and_expect(char *message, uint16_t timeout)
     {
         // read the uart and check that the character matches
         char currentValue = read_uart(timeout);
-        if (currentValue == '\0')
-            return -1;
         if (*(message++) != currentValue)
             return -1;
     }
@@ -155,10 +153,8 @@ int8_t find_pattern(char *pattern, uint16_t patternLength, uint16_t timeout)
         char currentValue = read_uart(timeout);
         if (currentValue == *(pattern + matchingChars))
             matchingChars++;
-        // else if (currentValue == '\0')
-        //     return -1;
         else
-            matchingChars = 0U;
+            matchingChars = 0;
     }
     return 0;
 }
