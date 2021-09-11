@@ -12,9 +12,12 @@ int8_t mode_btc(void)
 {
     puts("Fetching price...");
 
+    char requestSizeString[5];
+    snprintf(requestSizeString, 5, "%d", strlen(REQUEST));
+
     Http parsedHttp;
     // fetch price and convert it to a string
-    if (make_http_request(&parsedHttp, "rate", PROTOCOL, HOST, PORT, REQUEST_SIZE, REQUEST) != 0)
+    if (make_http_request(&parsedHttp, "rate", PROTOCOL, HOST, PORT, requestSizeString, REQUEST) != 0)
     {
 #ifdef SYSTEM_DEBUG__
         printf("FAILED AT LINE %d IN FILE %s\n", __LINE__, __FILE__);
