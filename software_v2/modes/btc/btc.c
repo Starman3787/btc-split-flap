@@ -15,7 +15,12 @@ int8_t mode_btc(void)
     Http parsedHttp;
     // fetch price and convert it to a string
     if (make_http_request(&parsedHttp, "rate", PROTOCOL, HOST, PORT, REQUEST_SIZE, REQUEST) != 0)
+    {
+#ifdef SYSTEM_DEBUG__
+        printf("FAILED AT LINE %d IN FILE %s\n", __LINE__, __FILE__);
+#endif
         return -1;
+    }
 
     if (parsedHttp.statusCode != 200)
     {
@@ -44,17 +49,18 @@ int8_t mode_btc(void)
         toggle_motor(2);
         toggle_motor(3);
         toggle_motor(4);
-
     }
     else
     {
         int64_t rate = parsedHttp.responseBody.data.data_json.data.json_number;
 
+#ifdef SYSTEM_DEBUG__
         printf("PRICE: %llu\n", rate);
 
         printf("UNIX_TIME: %lli\n", unix);
 
         printf("STARTUP_TIME: %llu\n", ticks);
+#endif
 
         // enable all motors
         toggle_motor(0);
@@ -83,7 +89,6 @@ int8_t mode_btc(void)
         toggle_motor(2);
         toggle_motor(3);
         toggle_motor(4);
-
     }
 
     return 0;

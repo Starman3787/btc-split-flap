@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include <stdio.h>
 #include <ctype.h>
 #include "drivers/uart/uart.h"
 #include "util/http/http.h"
@@ -17,9 +18,19 @@ int8_t skip_whitespace(char **cursor)
 int8_t get_property_name(char elementKey[], char **cursor)
 {
     if (skip_whitespace(cursor) != 0)
+    {
+#ifdef SYSTEM_DEBUG__
+        printf("FAILED AT LINE %d IN FILE %s\n", __LINE__, __FILE__);
+#endif
         return -1;
+    }
     if (**cursor == 't' || **cursor == 'f' || **cursor == 'n' || **cursor == '[' || **cursor == '{')
+    {
+#ifdef SYSTEM_DEBUG__
+        printf("FAILED AT LINE %d IN FILE %s\n", __LINE__, __FILE__);
+#endif
         return -1;
+    }
     INCREMENT_POINTER((*cursor))
     elementKey[0] = '\0';
     for (uint8_t i = 0; **cursor != '"' && i < 62; i++)
@@ -79,7 +90,12 @@ int8_t parse_element(Json *jsonElement, const char *jsonProperty, char **cursor)
 {
     char elementKey[64];
     if (get_property_name(elementKey, cursor) != 0)
+    {
+#ifdef SYSTEM_DEBUG__
+        printf("FAILED AT LINE %d IN FILE %s\n", __LINE__, __FILE__);
+#endif
         return -1;
+    }
     bool wantedElement = false;
     if (strcmp(elementKey, jsonProperty) == 0)
     {
@@ -90,7 +106,12 @@ int8_t parse_element(Json *jsonElement, const char *jsonProperty, char **cursor)
     {
         INCREMENT_POINTER((*cursor))
         if (skip_whitespace(cursor) != 0)
+        {
+#ifdef SYSTEM_DEBUG__
+            printf("FAILED AT LINE %d IN FILE %s\n", __LINE__, __FILE__);
+#endif
             return -1;
+        }
     }
     char elementString[128];
     bool elementBoolean;
@@ -101,7 +122,12 @@ int8_t parse_element(Json *jsonElement, const char *jsonProperty, char **cursor)
         // string
         INCREMENT_POINTER((*cursor))
         if (get_string(elementString, cursor) != 0)
+        {
+#ifdef SYSTEM_DEBUG__
+            printf("FAILED AT LINE %d IN FILE %s\n", __LINE__, __FILE__);
+#endif
             return -1;
+        }
         if (wantedElement == true)
         {
             jsonElement->type = JSON_STRING;
@@ -114,7 +140,12 @@ int8_t parse_element(Json *jsonElement, const char *jsonProperty, char **cursor)
     case 'n':
         // boolean
         if (get_boolean(&elementBoolean, cursor) != 0)
+        {
+#ifdef SYSTEM_DEBUG__
+            printf("FAILED AT LINE %d IN FILE %s\n", __LINE__, __FILE__);
+#endif
             return -1;
+        }
         if (wantedElement == true)
         {
             jsonElement->type = JSON_BOOLEAN;
@@ -125,7 +156,12 @@ int8_t parse_element(Json *jsonElement, const char *jsonProperty, char **cursor)
     default:
         // number
         if (get_number(&elementNumber, cursor) != 0)
+        {
+#ifdef SYSTEM_DEBUG__
+            printf("FAILED AT LINE %d IN FILE %s\n", __LINE__, __FILE__);
+#endif
             return -1;
+        }
         if (wantedElement == true)
         {
             jsonElement->type = JSON_NUMBER;
@@ -135,7 +171,12 @@ int8_t parse_element(Json *jsonElement, const char *jsonProperty, char **cursor)
         break;
     }
     if (skip_whitespace(cursor) != 0)
+    {
+#ifdef SYSTEM_DEBUG__
+        printf("FAILED AT LINE %d IN FILE %s\n", __LINE__, __FILE__);
+#endif
         return -1;
+    }
     return 1;
 }
 
@@ -147,12 +188,20 @@ int8_t parse_json(Json *jsonElement, const char *jsonProperty, char *body)
     while (*body != '\0')
     {
         if (skip_whitespace(&body) != 0)
+        {
+#ifdef SYSTEM_DEBUG__
+            printf("FAILED AT LINE %d IN FILE %s\n", __LINE__, __FILE__);
+#endif
             return -1;
+        }
         if (*body == '\0')
             break;
         if (parse_element(jsonElement, jsonProperty, &body) == 0)
             return 0;
         INCREMENT_POINTER(body)
     }
+#ifdef SYSTEM_DEBUG__
+    printf("FAILED AT LINE %d IN FILE %s\n", __LINE__, __FILE__);
+#endif
     return -1;
 }
