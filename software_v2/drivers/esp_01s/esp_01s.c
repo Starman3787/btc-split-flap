@@ -57,6 +57,8 @@ int8_t send_cip_start_command(char *protocol, char *host, char *port)
     strncat(command, host, CIP_START_COMMAND_MAX_LENGTH - strlen(command));
     strncat(command, "\",", CIP_START_COMMAND_MAX_LENGTH - strlen(command));
     strncat(command, port, CIP_START_COMMAND_MAX_LENGTH - strlen(command));
+    // clear the current value in the UART
+    read_uart(100);
     write_full_uart(command);
     strcat(command, "\r\r\n");
     if (read_full_uart_and_expect(command, 10000) != 0)
