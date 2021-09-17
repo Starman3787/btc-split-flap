@@ -66,8 +66,6 @@ int8_t send_cip_start_command(char *protocol, char *host, char *port)
 #ifdef SYSTEM_DEBUG__
         printf("FAILED AT LINE %d IN FILE %s\n", __LINE__, __FILE__);
 #endif
-        while (1)
-            ticks++;
         return -1;
     }
     if (read_full_uart_and_expect("CONNECT", 10000) != 0)
