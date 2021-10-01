@@ -41,7 +41,7 @@ int8_t init_split_flap(void)
             }
             else
                 notAtHome++;
-        delay_ms(10);
+        delay_ms(12 / MICROSTEPS);
     } while (notAtHome != MODULE_COUNT);
     while (!check_all_at_position(0))
     {
@@ -55,7 +55,7 @@ int8_t init_split_flap(void)
                     module_positions[i] = 0;
             }
         }
-        delay_ms(10);
+        delay_ms(12 / MICROSTEPS);
     }
 
     return 0;
@@ -172,9 +172,8 @@ bool check_positions_have_been_reached(uint8_t requiredPositions[])
 
 void display_message(char *message)
 {
-    uint8_t requiredPositions[MODULE_COUNT];
+    uint8_t requiredPositions[MODULE_COUNT], increment[MODULE_COUNT];
     convert_string_to_positions(message, requiredPositions);
-    uint8_t increment[MODULE_COUNT];
     for (uint8_t i = 0; i < MODULE_COUNT; i++)
         increment[i] = 0;
     while (!check_positions_have_been_reached(requiredPositions))
@@ -186,13 +185,13 @@ void display_message(char *message)
                 write_motor(i);
                 write_motor(i);
                 increment[i]++;
-                if (increment[i] == (STEPS / FLAPS))
+                if (increment[i] == (STEPS / FLAPS) * MICROSTEPS)
                 {
                     module_positions[i] == 39 ? module_positions[i] = 0 : module_positions[i]++;
                     increment[i] = 0;
                 }
             }
         }
-        delay_ms(10);
+        delay_ms(12 / MICROSTEPS);
     }
 }

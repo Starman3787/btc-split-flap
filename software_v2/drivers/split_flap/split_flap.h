@@ -10,4 +10,6 @@ uint8_t module_positions[MODULE_COUNT];
 int8_t init_split_flap(void);
 void display_message(char *message);
 
+#define MICROSTEPS      (2)
+
 #endif
