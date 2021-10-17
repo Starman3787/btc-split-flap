@@ -1,28 +1,12 @@
-/**
- * @file hall_effect_sensor.h
- * @author Starman
- * @brief Hall effect sensor header file 
- * @version 0.1
- * @date 2021-05-29
- * 
- * @copyright Copyright (c) 2021
- * 
- */
-#include <stdint.h>
+#ifndef DRIVERS_HALL_EFFECT_SENSOR_H_
+#define DRIVERS_HALL_EFFECT_SENSOR_H_
 
-/**
- * Pin  - Sensor
- * 
- * PE2  - 0
- * PE3  - 1
- * PE4  - 2
- * PE5  - 3
- * PE6  - 4
- *
- */
-uint8_t hall_effect_sensor_pins[] = {
-    2,
-    3,
-    4,
-    5,
-    6};
+#include <stdint.h>
+#include <stdbool.h>
+
+extern uint8_t hall_effect_sensor_pins[5];
+
+int8_t init_hall_effect_sensor(void);
+bool read_hall_effect_sensor(uint16_t sensor);
+
+#endif
