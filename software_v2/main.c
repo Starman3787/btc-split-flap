@@ -54,11 +54,6 @@ void main(void)
     mode_btc();
 
     while (1)
-    {
-
-        // mode_test();
-        // 900
         if ((unix + 120) % 900 == 0)
             mode_btc();
-    }
 }
