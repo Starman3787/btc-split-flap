@@ -36,7 +36,9 @@ int8_t init_esp_01s(void)
 #endif
         return -1;
     }
-    delay_ms(5000);
+#ifdef SYSTEM_DEBUG__
+    puts("WIFI GOT IP");
+#endif
     if (esp_01s_test() != 0)
     {
 #ifdef SYSTEM_DEBUG__
@@ -60,8 +62,14 @@ int8_t send_cip_start_command(char *protocol, char *host, char *port)
     // clear the current value in the UART
     read_uart(100);
     write_full_uart(command);
-    strcat(command, "\r\r\n");
     if (read_full_uart_and_expect(command, 10000) != 0)
+    {
+#ifdef SYSTEM_DEBUG__
+        printf("FAILED AT LINE %d IN FILE %s\n", __LINE__, __FILE__);
+#endif
+        return -1;
+    }
+    if (read_full_uart_and_expect("\r\r\n", 10000) != 0)
     {
 #ifdef SYSTEM_DEBUG__
         printf("FAILED AT LINE %d IN FILE %s\n", __LINE__, __FILE__);
@@ -215,6 +223,8 @@ int8_t response_parser(Http *response, char *jsonProperty)
     time_t timestamp;
     parse_date(&timestamp, currentTimeString.value);
     unix = timestamp;
+    // clean up UART
+    read_uart(100);
     return 0;
 }
 
