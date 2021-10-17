@@ -6,7 +6,7 @@
 extern uint8_t uart_pins[4];
 
 #define CORE_CLOCK      (16000000U)
-#define BAUD_RATE       (9600U)
+#define BAUD_RATE       (115200U)
 
 int8_t init_uart(void);
 void print(char byte);
