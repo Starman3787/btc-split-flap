@@ -22,6 +22,32 @@ int8_t mode_btc(void)
 #ifdef SYSTEM_DEBUG__
         printf("FAILED AT LINE %d IN FILE %s\n", __LINE__, __FILE__);
 #endif
+
+        // enable all motors
+        toggle_motor(0);
+        toggle_motor(1);
+        toggle_motor(2);
+        toggle_motor(3);
+        toggle_motor(4);
+
+        // give motors a second to stabilise
+        delay_ms(1000);
+
+        // initialise all motors to their home position
+        init_split_flap();
+
+        display_message("ERROR");
+
+        // give motors a second to stabilise
+        delay_ms(1000);
+
+        // disable all motors
+        toggle_motor(0);
+        toggle_motor(1);
+        toggle_motor(2);
+        toggle_motor(3);
+        toggle_motor(4);
+
         return -1;
     }
 
