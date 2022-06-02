@@ -7,17 +7,20 @@
 #include "drivers/stepper_motor/stepper_motor.h"
 #include "timers/systick/systick.h"
 #include "util/delay/delay.h"
+#include "drivers/uart/uart.h"
+#include "modes/btc/btc.h"
 
 int8_t mode_btc(void)
 {
-    puts("Fetching price...");
+    newModeUpdated = true;
 
-    char requestSizeString[5];
-    snprintf(requestSizeString, 5, "%d", strlen(REQUEST));
+#ifdef SYSTEM_DEBUG__
+    puts("Fetching price...");
+#endif
 
     Http parsedHttp;
     // fetch price and convert it to a string
-    if (make_http_request(&parsedHttp, "rate", PROTOCOL, HOST, PORT, requestSizeString, REQUEST) != 0)
+    if (make_http_request(&parsedHttp, "rate") != 0)
     {
 #ifdef SYSTEM_DEBUG__
         printf("FAILED AT LINE %d IN FILE %s\n", __LINE__, __FILE__);
