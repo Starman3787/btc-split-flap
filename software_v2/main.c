@@ -13,8 +13,14 @@
 #include "util/http/http.h"
 #include "modes/btc/btc.h"
 #include "modes/test/test.h"
+#include "modes/custom/custom.h"
 volatile uint64_t ticks = 0;
 volatile time_t unix = 0;
+uint8_t currentMode = btc;
+char modeCustomText[MODULE_COUNT + 1];
+bool newModeUpdated = true;
+char irq_uart_char;
+bool irq_uart_char_read = true;
 
 void main(void)
 {
@@ -54,6 +60,40 @@ void main(void)
     mode_btc();
 
     while (1)
-        if ((unix + 120) % 900 == 0)
-            mode_btc();
+    {
+        switch (currentMode)
+        {
+        case btc:
+        {
+            if (newModeUpdated != true)
+                mode_btc();
+            if ((unix + 120) % 900 == 0)
+                mode_btc();
+            break;
+        }
+        case custom:
+        {
+            if (newModeUpdated != true)
+                mode_custom(modeCustomText);
+            break;
+        }
+        }
+        if (irq_uart_char_read == false)
+        {
+            switch (irq_uart_char)
+            {
+            case 'C':
+            {
+                check_incoming_config();
+                break;
+            }
+            case 'M':
+            {
+                check_incoming_mode();
+                break;
+            }
+            }
+            irq_uart_char_read = true;
+        }
+    }
 }

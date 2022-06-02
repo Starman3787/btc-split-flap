@@ -28,9 +28,10 @@ CFLAGS += -mthumb
 CFLAGS += -Wall
 CFLAGS += -Werror
 CFLAGS += -g3
-CFLAGS += -O2
+CFLAGS += -O0
 CFLAGS += -std=c17
 CFLAGS += -D_FORTIFY_SOURCE=2
+# CFLAGS += -DSYSTEM_DEBUG__
 # (Set error messages to appear on a single line.)
 CFLAGS += -fmessage-length=0
 # (Set system to ignore semihosted junk)
@@ -38,6 +39,7 @@ CFLAGS += --specs=nosys.specs
 CFLAGS += -DSTM32F767xx
 CFLAGS += -Wno-main
 CFLAGS += -Wno-sequence-point
+CFLAGS += -Wno-unused-but-set-variable
 
 # Linker directives.
 LSCRIPT = ./$(LD_SCRIPT)
@@ -72,6 +74,7 @@ C_SRC += ./util/http/body/http_body_parser.c
 C_SRC += ./util/http/body/types/json.c
 C_SRC += ./modes/test/test.c
 C_SRC += ./modes/btc/btc.c
+C_SRC += ./modes/custom/custom.c
 C_SRC += ./retarget.c
 
 INCLUDE = -I.

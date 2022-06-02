@@ -5,7 +5,6 @@
 
 int8_t mode_test(void)
 {
-
     // enable all motors
     toggle_motor(0);
     toggle_motor(1);
