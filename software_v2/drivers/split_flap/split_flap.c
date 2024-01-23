@@ -187,7 +187,7 @@ void display_message(char *message)
                 increment[i]++;
                 if (increment[i] == (STEPS / FLAPS) * MICROSTEPS)
                 {
-                    module_positions[i] == 39 ? module_positions[i] = 0 : module_positions[i]++;
+                    module_positions[i] == (FLAPS - 1) ? module_positions[i] = 0 : module_positions[i]++;
                     increment[i] = 0;
                 }
             }
